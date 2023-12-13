@@ -1,18 +1,11 @@
-from typing import Optional
-
-from pydantic import BaseModel
+from fastapi_users import schemas
 
 
-class LoginForm(BaseModel):
-    username: str
-    password: str
+class UserCreate(schemas.BaseUserCreate):
+    """pydantic model for create user"""
+    pass
 
 
-class RegistrationForm(BaseModel):
-    email: str
-    username: str
-    password: str
-
-    last_name: Optional[str]
-    first_name: Optional[str]
-
+class UserUpdate(schemas.BaseUserUpdate):
+    """pydantic model for update user profile *"""
+    pass
