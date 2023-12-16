@@ -9,9 +9,9 @@ class Config(BaseSettings):
         secrets_dir=Path(__file__).parent / "secrets",
     )
 
+    secret: str
     mongodb_user: str
     mongodb_password: str
-    secret: str
 
 
 @lru_cache

@@ -1,11 +1,13 @@
 from fastapi_users import schemas
+from pydantic import BaseModel
 
 
-class UserCreate(schemas.BaseUserCreate):
+class SignUpForm(schemas.BaseUserCreate):
     """pydantic model for create user"""
     pass
 
 
-class UserUpdate(schemas.BaseUserUpdate):
+class SignInForm(BaseModel):
     """pydantic model for update user profile *"""
-    pass
+    username: str
+    password: str
