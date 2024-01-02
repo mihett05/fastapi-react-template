@@ -1,16 +1,47 @@
-from fastapi import APIRouter
+from beanie import init_beanie
+from fastapi import Depends, APIRouter
 
-from auth.models import LoginForm
-from users.schemas import User
+from auth.db import User, db
+from auth.schemas import UserCreate, UserRead, UserUpdate
+from auth.users import auth_backend, current_active_user, fastapi_users
 
 router = APIRouter()
 
+router.include_router(
+    fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
+)
+router.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+router.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+router.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["auth"],
+)
+router.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["users"],
+)
 
-@router.post("/login")
-async def login_user(body: LoginForm):
-    user = await User.find_one(
-        User.username == body.username, User.hashed_password == body.password
+
+@router.get("/authenticated-route")
+async def authenticated_route(user: User = Depends(current_active_user)):
+    return {"message": f"Hello {user.email}!"}
+
+
+@router.on_event("startup")
+async def on_startup():
+    await init_beanie(
+        database=db,
+        document_models=[
+            User,
+        ],
     )
-
-# https://fastapi-users.github.io/ - готовая либа
-# https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/ - сам jwt аутентификацию пишешь

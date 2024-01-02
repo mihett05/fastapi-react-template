@@ -1,14 +1,14 @@
-from beanie import init_beanie
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 
 from api import api
 from mongodb import init_mongodb
 
 
 @asynccontextmanager
-async def lifespan():
+async def lifespan(*args):
     await init_mongodb()
     yield
 

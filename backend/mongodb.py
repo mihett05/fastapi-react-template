@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from config import get_config
 
-from users.schemas import User
+from auth.db import User
 
 
 async def init_mongodb():

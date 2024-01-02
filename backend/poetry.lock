@@ -298,6 +298,21 @@ redis = ["redis (>=4.3.3,<6.0.0)"]
 sqlalchemy = ["fastapi-users-db-sqlalchemy (>=6.0.0)"]
 
 [[package]]
+name = "fastapi-users-db-beanie"
+version = "3.0.0"
+description = "FastAPI Users database adapter for Beanie"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "fastapi_users_db_beanie-3.0.0-py3-none-any.whl", hash = "sha256:4ed99cca9565cfa67bed436def0b27705142230409516915448494fbfc0fb031"},
+    {file = "fastapi_users_db_beanie-3.0.0.tar.gz", hash = "sha256:5f8000d394ddc065a5eaf7244aa2ac3603acd6a2184d12fa6fa5237b78126369"},
+]
+
+[package.dependencies]
+beanie = ">=1.11.0,<2.0.0"
+fastapi-users = ">=10.0.1"
+
+[[package]]
 name = "h11"
 version = "0.14.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -607,6 +622,7 @@ files = [
     {file = "pymongo-4.6.1-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:b8729dbf25eb32ad0dc0b9bd5e6a0d0b7e5c2dc8ec06ad171088e1896b522a74"},
     {file = "pymongo-4.6.1-cp312-cp312-win32.whl", hash = "sha256:3177f783ae7e08aaf7b2802e0df4e4b13903520e8380915e6337cdc7a6ff01d8"},
     {file = "pymongo-4.6.1-cp312-cp312-win_amd64.whl", hash = "sha256:00c199e1c593e2c8b033136d7a08f0c376452bac8a896c923fcd6f419e07bdd2"},
+    {file = "pymongo-4.6.1-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:6dcc95f4bb9ed793714b43f4f23a7b0c57e4ef47414162297d6f650213512c19"},
     {file = "pymongo-4.6.1-cp37-cp37m-manylinux1_i686.whl", hash = "sha256:13552ca505366df74e3e2f0a4f27c363928f3dff0eef9f281eb81af7f29bc3c5"},
     {file = "pymongo-4.6.1-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:77e0df59b1a4994ad30c6d746992ae887f9756a43fc25dec2db515d94cf0222d"},
     {file = "pymongo-4.6.1-cp37-cp37m-manylinux2014_aarch64.whl", hash = "sha256:3a7f02a58a0c2912734105e05dedbee4f7507e6f1bd132ebad520be0b11d46fd"},
@@ -771,4 +787,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "870249df30a55f1a528d3bcc4ac3036cebab595b0dd20d232a5d711638ec32a0"
+content-hash = "c5b6750704751c88527ba188e076942ed725a22ea472bf74d53dc05626f69c6c"
