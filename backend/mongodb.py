@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from config import get_config
 
-from auth.db import User
+from auth.schemas import User
 
 
 async def init_mongodb():
@@ -12,4 +12,4 @@ async def init_mongodb():
         f"mongodb://{config.mongodb_user}:{config.mongodb_password}@localhost:27017"
     )
 
-    await init_beanie(database=client.db, document_models=[User])
+    await init_beanie(database=client.db, document_models=[User, ],)

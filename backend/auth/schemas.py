@@ -1,15 +1,10 @@
-import uuid
+from beanie import Document
+from fastapi_users.db import BeanieBaseUser, BeanieUserDatabase
 
-from fastapi_users import schemas
 
-
-class UserRead(schemas.BaseUser[uuid.UUID]):
+class User(BeanieBaseUser, Document):
     pass
 
 
-class UserCreate(schemas.BaseUserCreate):
-    pass
-
-
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
+async def get_user_db():
+    yield BeanieUserDatabase(User)
