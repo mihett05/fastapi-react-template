@@ -1,5 +1,5 @@
 from inspect import getfullargspec
-from typing import Callable
+from typing import Callable, Dict, Optional, Any
 
 from fastapi import WebSocket
 
@@ -43,15 +43,17 @@ class EventHandler:
         return func
 
     async def run(
-        self,
-        event: EventType,
-        data: dict,
-        websocket: WebSocket,
-        manager: ConnectionManager,
-        event_data: Response,
+            self,
+            event: EventType,
+            data: dict,
+            websocket: WebSocket,
+            manager: ConnectionManager,
+            event_data: Optional[Dict, None],
+            user: UserRead = None
     ):
-        if event != self.type:
+        if event != self.type or (event != EventType.AUTH and manager.is_user_authenticated(user)):
             return
+
         if not self.request_type or not issubclass(self.request_type, (Request,)):
             raise ValueError(f"'{self.type}' handler has invalid 'request_type'")
 
@@ -63,12 +65,11 @@ class EventHandler:
             WebSocket: websocket,
             ConnectionManager: manager,
             SendResponse: send_response,
-            Response: event_data,
         }
 
         for handler in self.handlers:
             annotations = getfullargspec(handler).annotations
-            return_type = annotations.pop("return", None)
+            _ = annotations.pop("return", None)
             kwargs = {}
 
             for arg, t in annotations.items():

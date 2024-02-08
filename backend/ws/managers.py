@@ -1,15 +1,22 @@
-from typing import List
+from typing import Dict, Tuple
+from uuid import UUID
 
 from fastapi import WebSocket
 
+from auth.models import UserRead
+
 
 class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
+    active_connections: Dict[UUID, Tuple[UserRead, WebSocket]] = {}
 
-    async def add(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
+    def add(self, user: UserRead, websocket: WebSocket):
+        self.active_connections[user.id] = (user, websocket)
 
-    def remove(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+    def remove(self, user: UserRead, websocket: WebSocket):
+        if self.active_connections.get(user.id) is websocket:
+            self.active_connections.pop(user.id)
+
+    def is_user_authenticated(self, user: UserRead):
+        if user is None:
+            return False
+        return self.active_connections.get(user.id) is not None
