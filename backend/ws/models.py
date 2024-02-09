@@ -1,5 +1,6 @@
 from enum import Enum
 
+from fastapi import WebSocket
 from pydantic import BaseModel
 
 from auth.models import UserRead
@@ -20,3 +21,8 @@ class Response(BaseModel):
     user: UserRead
     event_type: EventType
     # some addition fields
+
+
+class WSUserData(BaseModel):
+    user: UserRead
+    websocket: WebSocket

@@ -1,5 +1,6 @@
 from typing import Optional
 
+from pydantic import ValidationError
 from starlette.websockets import WebSocket
 
 from auth.deps import get_jwt_strategy
@@ -33,10 +34,13 @@ async def handle(
     access_token = request.access_token
     user_payload = get_jwt_strategy().read_token(access_token, UserManager)
 
-    user = None
-    if user_payload is not None:
-        user = UserRead(**user_payload)
-        await manager.add(user, websocket)
+    if user_payload is None:
+        raise ValidationError("Invalid access token")
+
+    user = UserRead(**user_payload)
+    user_data = await manager.add(user, websocket)
 
     response = UpdateAuthResponse(user)
     await sender.send(response)
+
+    return user_data

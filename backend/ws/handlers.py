@@ -2,11 +2,12 @@ from inspect import getfullargspec
 from typing import Callable, Dict, Optional, Any
 
 from fastapi import WebSocket
+from pydantic import ValidationError
 
 from auth.deps import fastapi_users
 from auth.models import UserRead
 from ws.managers import ConnectionManager
-from ws.models import EventType, Request, Response
+from ws.models import EventType, Request, Response, WSUserData
 
 
 class SendResponse:
@@ -44,15 +45,17 @@ class EventHandler:
 
     async def run(
             self,
-            event: EventType,
             data: dict,
+            event: EventType,
             websocket: WebSocket,
             manager: ConnectionManager,
-            event_data: Optional[Dict, None],
-            user: UserRead = None
+            user_data: Optional[WSUserData] = None,
     ):
-        if event != self.type or (event != EventType.AUTH and manager.is_user_authenticated(user)):
+        if event != self.type:
             return
+
+        if event != EventType.AUTH and (user_data is None or manager.is_user_authenticated(user_data.user)):
+            raise ValidationError(f"Permission denied (user should be authorized)")
 
         if not self.request_type or not issubclass(self.request_type, (Request,)):
             raise ValueError(f"'{self.type}' handler has invalid 'request_type'")
@@ -63,8 +66,9 @@ class EventHandler:
         deps = {
             self.request_type: request,
             WebSocket: websocket,
-            ConnectionManager: manager,
+            WSUserData: user_data,
             SendResponse: send_response,
+            ConnectionManager: manager,
         }
 
         for handler in self.handlers:
@@ -76,6 +80,5 @@ class EventHandler:
                 for cls in deps:
                     if issubclass(t, cls):
                         kwargs[arg] = deps[cls]
-            await handler(**kwargs)
-
+            return await handler(**kwargs)
             # asyncio.create_task(handler(**kwargs))
