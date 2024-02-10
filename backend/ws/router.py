@@ -20,7 +20,7 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         data = await websocket.receive_json()
         try:
-            event = Request(**data).event
+            event = Request(**data).event_type
             resp = await handlers[event].run(
                 data=data,
                 event=event,
@@ -30,6 +30,8 @@ async def websocket_endpoint(websocket: WebSocket):
             )
             if event == EventType.AUTH:
                 user_data = resp
+
+            # await websocket.send_json(user_data.model_dump_json())
 
         except ValidationError as err:
             await websocket.send_json({"error": f"Invalid request ({err})"})

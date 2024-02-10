@@ -1,5 +1,5 @@
 from inspect import getfullargspec
-from typing import Callable, Dict, Optional, Any
+from typing import Callable, Optional
 
 from fastapi import WebSocket
 from pydantic import ValidationError
@@ -16,7 +16,7 @@ class SendResponse:
         self.websocket = websocket
 
     def update_response(self, response: Response):
-        response.user = UserRead(**fastapi_users.get_user_manager().get(self.request.uid).__dict__)
+        # response.user = UserRead(**fastapi_users.get_user_manager().get(self.request.uid).__dict__)
         response.event_type = self.request.event_type
 
     async def send(self, response: Response):

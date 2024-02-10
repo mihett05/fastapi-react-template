@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 from fastapi import WebSocket
@@ -7,9 +8,9 @@ from auth.models import UserRead
 
 
 class EventType(str, Enum):
-    AUTH = "AUTH"
-    MESSAGE = "MESSAGES"
-    NOTIFICATION = "NOTIFICATION"
+    AUTH: str = "AUTH"
+    MESSAGE: str = "MESSAGES"
+    NOTIFICATION: str = "NOTIFICATION"
     # e.t.c.
 
 
@@ -23,6 +24,7 @@ class Response(BaseModel):
     # some addition fields
 
 
-class WSUserData(BaseModel):
+@dataclass
+class WSUserData:
     user: UserRead
     websocket: WebSocket

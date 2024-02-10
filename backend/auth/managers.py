@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, AsyncGenerator
 
 from beanie import PydanticObjectId
 from fastapi import Depends, Request
@@ -23,5 +23,5 @@ class UserManager(ObjectIDIDMixin, BaseUserManager[User, PydanticObjectId]):
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
 
-async def get_user_manager(user_db: BeanieUserDatabase = Depends(get_user_db)):
+async def get_user_manager(user_db: BeanieUserDatabase = Depends(get_user_db)) -> UserManager:
     yield UserManager(user_db)
