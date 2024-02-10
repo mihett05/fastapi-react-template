@@ -25,7 +25,7 @@ class SendResponse:
 
 
 class EventHandler:
-    def __init__(self, event_type: EventType):
+    def __init__(self, event_type: str):
         self.type = event_type
         self.request_type = None
         self.response_type = None
@@ -55,7 +55,7 @@ class EventHandler:
             return
 
         if event != EventType.AUTH and (user_data is None or manager.is_user_authenticated(user_data.user)):
-            raise ValidationError(f"Permission denied (user should be authorized)")
+            raise ValueError(f"Permission denied (user should be authorized)")
 
         if not self.request_type or not issubclass(self.request_type, (Request,)):
             raise ValueError(f"'{self.type}' handler has invalid 'request_type'")

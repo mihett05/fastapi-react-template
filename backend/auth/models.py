@@ -1,10 +1,11 @@
 import uuid
 
+from beanie import PydanticObjectId
 from fastapi_users import schemas
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
-    pass
+    id: PydanticObjectId
 
 
 class UserCreate(schemas.BaseUserCreate):

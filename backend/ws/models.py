@@ -5,6 +5,7 @@ from fastapi import WebSocket
 from pydantic import BaseModel
 
 from auth.models import UserRead
+from auth.schemas import User
 
 
 class EventType(str, Enum):
@@ -26,5 +27,5 @@ class Response(BaseModel):
 
 @dataclass
 class WSUserData:
-    user: UserRead
+    user: User
     websocket: WebSocket

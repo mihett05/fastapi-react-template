@@ -31,8 +31,5 @@ async def websocket_endpoint(websocket: WebSocket):
             if event == EventType.AUTH:
                 user_data = resp
 
-            # await websocket.send_json(user_data.model_dump_json())
-
-        except ValidationError as err:
-            await websocket.send_json({"error": f"Invalid request ({err})"})
-        # await websocket.send_text(f"Message text was: {data}")
+        except (ValidationError, ValueError) as err:
+            await websocket.send_json({"error": f"Invalid request\nMore Info:\n({err})"})
