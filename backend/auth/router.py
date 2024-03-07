@@ -1,27 +1,32 @@
 from fastapi import APIRouter
 
-from auth.schemas import User
-from auth.models import LoginForm
-
+from auth.models import UserCreate, UserRead, UserUpdate
+from auth.deps import auth_backend, fastapi_users
 
 router = APIRouter()
 
-
-@router.get(
-    "/",
-    response_class=list[User],
-    response_description="Возвращает всех пользователей",
+router.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["auth"]
 )
-async def get_users():
-    return await User.find_all().to_list()
-
-
-@router.get("/")
-async def login_user(body: LoginForm):
-    user = await User.find_one(
-        User.username == body.username, User.hashed_password == body.password
-    )
-
-
-# https://fastapi-users.github.io/ - готовая либа
-# https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/ - сам jwt аутентификацию пишешь
+router.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
+router.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+router.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["auth"],
+)
+router.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["users"],
+)

@@ -1,6 +1,17 @@
-from pydantic import BaseModel
+import uuid
+
+from beanie import PydanticObjectId
+from fastapi_users import schemas
 
 
-class LoginForm(BaseModel):
-    username: str
-    password: str
+class UserRead(schemas.BaseUser[uuid.UUID]):
+    id: PydanticObjectId
+
+
+class UserCreate(schemas.BaseUserCreate):
+    pass
+
+
+class UserUpdate(schemas.BaseUserUpdate):
+    pass
+

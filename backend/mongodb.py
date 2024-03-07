@@ -8,9 +8,8 @@ from auth.schemas import User
 
 async def init_mongodb():
     config = get_config()
-    print(config)
     client = AsyncIOMotorClient(
         f"mongodb://{config.mongodb_user}:{config.mongodb_password}@localhost:27017"
     )
 
-    await init_beanie(database=client.db, document_models=[User])
+    await init_beanie(database=client.db, document_models=[User, ],)

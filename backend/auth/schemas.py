@@ -1,7 +1,10 @@
 from beanie import Document
+from fastapi_users.db import BeanieBaseUser, BeanieUserDatabase
 
 
-class User(Document):
-    username: str
-    email: str
-    hashed_password: str
+class User(BeanieBaseUser, Document):
+    pass
+
+
+async def get_user_db():
+    yield BeanieUserDatabase(User)
