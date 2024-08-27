@@ -1,17 +1,9 @@
-import uuid
+from fastapi_users.db import SQLAlchemyBaseUserTable
+from sqlalchemy import Integer
+from sqlalchemy.orm import Mapped, mapped_column
 
-from beanie import PydanticObjectId
-from fastapi_users import schemas
-
-
-class UserRead(schemas.BaseUser[uuid.UUID]):
-    id: PydanticObjectId
+from core.sqlalchemy import Base
 
 
-class UserCreate(schemas.BaseUserCreate):
-    pass
-
-
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
-
+class User(SQLAlchemyBaseUserTable[int], Base):
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)

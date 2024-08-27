@@ -1,21 +1,41 @@
-from beanie import PydanticObjectId
-from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import (
-    AuthenticationBackend,
-    BearerTransport,
-    JWTStrategy,
-)
+from typing import Annotated, AsyncGenerator
 
-from auth.schemas import User
-from auth.managers import get_user_manager
+from fastapi import Depends
+from fastapi_users.authentication import JWTStrategy
+
+from fastapi_users.db import SQLAlchemyUserDatabase
+
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from config import get_config
+from core.deps import get_session
+from .manager import UserManager
+
+from .models import User
+
+
+async def get_user_db(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> AsyncGenerator[SQLAlchemyUserDatabase, None]:
+    yield SQLAlchemyUserDatabase(session, User)
+
+
+async def get_user_manager(
+    user_db: Annotated[SQLAlchemyUserDatabase, Depends(get_user_db)],
+) -> AsyncGenerator[UserManager, None]:
+    yield UserManager(user_db)
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=get_config().secret, lifetime_seconds=3600)
+    return JWTStrategy(
+        secret=get_config().secret,
+        lifetime_seconds=int(get_config().access_token_lifetime.total_seconds()),
+    )
 
 
-bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
-auth_backend = AuthenticationBackend(name="jwt", transport=bearer_transport, get_strategy=get_jwt_strategy)
-fastapi_users = FastAPIUsers[User, PydanticObjectId](get_user_manager, [auth_backend])
-current_active_user = fastapi_users.current_user(active=True)
+def get_jwt_refresh_strategy() -> JWTStrategy:
+    return JWTStrategy(
+        secret=get_config().secret,
+        lifetime_seconds=int(get_config().refresh_token_lifetime.total_seconds()),
+    )
