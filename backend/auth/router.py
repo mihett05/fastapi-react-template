@@ -1,73 +1,56 @@
-from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Cookie, HTTPException, status
-from fastapi_users.authentication import JWTStrategy
-from fastapi_users.authentication.transport.bearer import BearerResponse
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 
-from config import get_config
-from .backend import auth_backend
-from .deps import get_jwt_strategy, get_jwt_refresh_strategy, get_user_manager
-from .manager import UserManager
-from .schemas import UserRead, UserCreate, UserUpdate
-from .backend import fastapi_users
-
+from auth.deps import get_security, get_tokens, get_users_repository
+from auth.mappers import user_mapper
+from auth.repository import UsersRepository
+from auth.schemas import UserAuthenticate, UserCreate, UserRead, UserWithToken
+from auth.security import SecurityGateway
+from auth.tokens import TokensGateway
+from auth.usecases import authenticate_user, create_token_pair
 
 router = APIRouter()
 
-router.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix="/jwt",
-    tags=["auth"],
-)
-router.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate),
-    tags=["auth"],
-)
-router.include_router(
-    fastapi_users.get_reset_password_router(),
-    tags=["auth"],
-)
-router.include_router(
-    fastapi_users.get_verify_router(UserRead),
-    tags=["auth"],
-)
-router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix="/users",
-    tags=["users"],
-)
-
-# TODO: сделать добавление refresh cookie в response для login
-# TODO: сделать logout который удаляет refresh cookie
+REFRESH_COOKIE = "refresh"
 
 
-@router.post("/jwt/refresh", tags=["auth"], response_model=BearerResponse)
-async def refresh_token(
-    strategy: Annotated[JWTStrategy, Depends(get_jwt_strategy)],
-    refresh_strategy: Annotated[JWTStrategy, Depends(get_jwt_refresh_strategy)],
-    refresh: Annotated[str | None, Cookie()],
-    user_manager: Annotated[UserManager, Depends(get_user_manager)],
+@router.get("/me", response_model=UserRead)
+async def get_user():
+    pass
+
+
+@router.post("/login", response_model=UserWithToken)
+async def login_user(
+    auth_data: UserAuthenticate,
+    users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+    security_gateway: Annotated[SecurityGateway, Depends(get_security)],
+    tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ):
-    if not refresh:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token required"
-        )
-
-    user = await refresh_strategy.read_token(refresh, user_manager)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired"
-        )
-
-    new_refresh = await refresh_strategy.write_token(user)
-
-    response = await auth_backend.login(strategy, user)
-    response.set_cookie(
-        "refresh",
-        new_refresh,
-        httponly=True,
-        expires=datetime.utcnow() + get_config().refresh_token_lifetime,
+    user = await authenticate_user(
+        auth_data.email,
+        auth_data.password,
+        users_repository=users_repository,
+        security_gateway=security_gateway,
     )
 
+    tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
+
+    response = JSONResponse(
+        content=UserWithToken(
+            user=user_mapper(user), access_token=tokens_pair.access_token
+        ).model_dump(),
+    )
+    response.set_cookie(REFRESH_COOKIE, tokens_pair.refresh_token)
     return response
+
+
+@router.post("/register", response_model=UserWithToken)
+async def register_user(register_data: UserCreate):
+    pass
+
+
+@router.post("/refresh", response_model=str)
+async def refresh_token():
+    pass

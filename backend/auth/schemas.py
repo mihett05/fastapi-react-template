@@ -1,13 +1,28 @@
-from fastapi_users import schemas
+from core.pydantic import PydanticModel
 
 
-class UserRead(schemas.BaseUser[int]):
-    pass
+class UserRead(PydanticModel):
+    id: int
+    email: str
+    is_active: bool
+    is_superuser: bool
 
 
-class UserCreate(schemas.BaseUserCreate):
-    pass
+class UserWithToken(PydanticModel):
+    access_token: str
+    user: UserRead
 
 
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
+class UserCreate(PydanticModel):
+    email: str
+    password: str
+
+
+class UserUpdate(PydanticModel):
+    email: str
+    password: str
+
+
+class UserAuthenticate(PydanticModel):
+    email: str
+    password: str
