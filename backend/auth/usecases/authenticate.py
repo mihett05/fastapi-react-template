@@ -25,7 +25,7 @@ async def authenticate_user(
         raise InvalidCredentials()
 
 
-async def authenticate_user_by_access_token(
+async def authorize_user(
         dto: TokenInfo,
         *,
         users_repository: UsersRepository,

@@ -4,16 +4,14 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from auth import consts
-from auth.deps import get_security, get_tokens, get_users_repository
+from auth.deps import get_security, get_tokens, get_users_repository, extract_access_token, extract_refresh_token
 from auth.mappers import user_mapper
 from auth.repository import UsersRepository
 from auth.schemas import UserAuthenticate, UserCreate, UserRead, UserWithToken
 from auth.security import SecurityGateway
 from auth.tokens import TokensGateway
 from auth.tokens.dtos import TokenInfo
-from auth.usecases import authenticate_user, create_token_pair
-from auth.usecases.authenticate import authenticate_user_by_access_token
-from auth.usecases.tokens import extract_access_token, extract_refresh_token
+from auth.usecases import authenticate_user, authorize_user, create_token_pair
 
 router = APIRouter()
 
@@ -23,7 +21,7 @@ async def get_user(
         users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
         token_info: TokenInfo = Depends(extract_access_token),
 ):
-    user = await authenticate_user_by_access_token(
+    user = await authorize_user(
         token_info,
         users_repository=users_repository,
     )
