@@ -11,7 +11,7 @@ PROJECT_PATH = Path(__file__).parent.parent
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=BACKEND_PATH / ".env",
+        env_file=BACKEND_PATH / "env",
     )
 
     secret: str

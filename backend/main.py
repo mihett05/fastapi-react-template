@@ -15,7 +15,9 @@ def custom_generate_unique_id(route: APIRoute):
         return route.name
 
 
-app = FastAPI(generate_unique_id_function=custom_generate_unique_id)
+app = FastAPI(
+    docs_url="/docs",
+    generate_unique_id_function=custom_generate_unique_id)
 
 
 @app.exception_handler(EntityNotFound)
@@ -28,7 +30,7 @@ async def entity_not_found_exception_handler(request: Request, exc: EntityNotFou
 
 @app.exception_handler(InvalidCredentials)
 async def invalid_credentials_exception_handler(
-    request: Request, exc: InvalidCredentials
+        request: Request, exc: InvalidCredentials
 ):
     return JSONResponse(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,8 +50,7 @@ app.add_middleware(
 
 app.include_router(api)
 
-
 if __name__ == "__main__":
     from uvicorn import run
 
-    run("main:app", reload=True, port=8000)
+    run("main:app", reload=True, port=5000, host="0.0.0.0")
