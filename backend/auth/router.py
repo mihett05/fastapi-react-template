@@ -22,7 +22,7 @@ router = APIRouter()
 async def get_user(
         user: Annotated[User, Depends(get_current_user)],
 ):
-    return JSONResponse(content=user_mapper(user).model_dump())
+    return JSONResponse(content=user_mapper(user).model_dump(by_alias=True))
 
 
 @router.post("/login", response_model=UserWithToken)
@@ -44,15 +44,28 @@ async def login_user(
         content=UserWithToken(
             user=user_mapper(user),
             access_token=tokens_pair.access_token
-        ).model_dump(),
+        ).model_dump(by_alias=True),
     )
     response.set_cookie(consts.REFRESH_COOKIE, tokens_pair.refresh_token)
     return response
 
 
 @router.post("/register", response_model=UserWithToken)
-async def register_user(register_data: UserCreate):
-    pass
+async def register_user(
+        dto: UserCreate,
+        users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+        tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)], ):
+    user = await users_repository.add(dto)
+    tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
+
+    response = JSONResponse(
+        content=UserWithToken(
+            user=user_mapper(user),
+            access_token=tokens_pair.access_token
+        ).model_dump(by_alias=True),
+    )
+    response.set_cookie(consts.REFRESH_COOKIE, tokens_pair.refresh_token)
+    return response
 
 
 @router.post("/refresh", response_model=str)
@@ -70,7 +83,7 @@ async def refresh_token(
         content=UserWithToken(
             user=user_mapper(user),
             access_token=tokens_pair.access_token
-        ).model_dump(),
+        ).model_dump(by_alias=True),
     )
     response.set_cookie(consts.REFRESH_COOKIE, tokens_pair.refresh_token)
     return response
