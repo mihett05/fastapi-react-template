@@ -13,8 +13,8 @@ class UsersRepository:
         self.session = session
         self.security_gateway = security_gateway
 
-    async def get(self, id: int) -> User:
-        if user := await self.session.get(User, id):
+    async def get(self, user_id: int) -> User:
+        if user := await self.session.get(User, user_id):
             return user
         raise UserNotFound()
 
@@ -42,5 +42,5 @@ class UsersRepository:
         # TODO: мб рефреш ещё сделать?
 
     async def delete(self, user: User):
-        self.session.delete(user)
+        await self.session.delete(user)
         await self.session.commit()
