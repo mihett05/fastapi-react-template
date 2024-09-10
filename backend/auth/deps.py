@@ -43,8 +43,8 @@ async def extract_access_token(
 
 
 async def extract_refresh_token(
-        cookie: Annotated[str | None, Depends(Cookie(alias=consts.REFRESH_COOKIE))],
         tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+        cookie: Annotated[str | None, Cookie(alias=consts.REFRESH_COOKIE)],
 ) -> TokenInfo:
     return await tokens_gateway.extract_token_info(cookie)
 
