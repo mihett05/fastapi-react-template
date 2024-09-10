@@ -11,6 +11,5 @@ RUN poetry install --without dev
 COPY . /app
 
 RUN chmod +x ./entrypoint.sh
-RUN ./entrypoint.sh
 
-CMD ["poetry", "run", "python3", "main.py"]
+CMD ["./entrypoint.sh"]
