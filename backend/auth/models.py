@@ -11,5 +11,5 @@ class User(Base):
     hashed_password: Mapped[str]
     salt: Mapped[str]
 
-    is_active: Mapped[bool]
-    is_superuser: Mapped[bool]
+    is_active: Mapped[bool] = mapped_column(default=True)
+    is_superuser: Mapped[bool] = mapped_column(default=False)
