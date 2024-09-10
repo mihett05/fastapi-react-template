@@ -1,6 +1,6 @@
 from core.exceptions import EntityNotFound
 
-from .models import User, Message, Chat
+from .models import User
 
 
 class InvalidCredentials(Exception):
@@ -11,14 +11,3 @@ class InvalidCredentials(Exception):
 class UserNotFound(EntityNotFound):
     def __init__(self):
         super().__init__(User)
-
-
-class MessageNotFound(EntityNotFound):
-    def __init__(self):
-        super().__init__(Message)
-
-
-class ChatNotFound(EntityNotFound):
-
-    def __init__(self):
-        super().__init__(Chat)
