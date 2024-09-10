@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer, APIKeyCookie
+from fastapi import Depends, Cookie
+from fastapi.security import OAuth2PasswordBearer, APIKeyCookie, HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth import consts
@@ -17,6 +17,7 @@ from .usecases import authorize_user
 
 cookie_scheme = APIKeyCookie(name=consts.REFRESH_COOKIE)
 oauth2_scheme = OAuth2PasswordBearer("/auth/token")
+http_scheme = HTTPBearer()
 
 
 async def get_tokens() -> TokensGateway:
@@ -35,17 +36,17 @@ async def get_users_repository(
 
 
 async def extract_access_token(
-        token: Annotated[str, Depends(oauth2_scheme)],
+        token: Annotated[HTTPAuthorizationCredentials, Depends(http_scheme)],
         tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ) -> TokenInfo:
-    return await tokens_gateway.extract_token_info(token)
+    return await tokens_gateway.extract_token_info(token.credentials)
 
 
 async def extract_refresh_token(
-        token: Annotated[str, Depends(oauth2_scheme)],
         tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+        cookie: Annotated[str | None, Cookie(alias=consts.REFRESH_COOKIE)],
 ) -> TokenInfo:
-    return await tokens_gateway.extract_token_info(token)
+    return await tokens_gateway.extract_token_info(cookie)
 
 
 async def get_current_user(
