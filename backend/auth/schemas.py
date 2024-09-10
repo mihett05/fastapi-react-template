@@ -1,11 +1,7 @@
+from pydantic import EmailStr
+
 from core.pydantic import PydanticModel
-
-
-class UserRead(PydanticModel):
-    id: int
-    email: str
-    is_active: bool
-    is_superuser: bool
+from users.schemas import UserRead
 
 
 class UserWithToken(PydanticModel):
@@ -13,16 +9,6 @@ class UserWithToken(PydanticModel):
     user: UserRead
 
 
-class UserCreate(PydanticModel):
-    email: str
-    password: str
-
-
-class UserUpdate(PydanticModel):
-    email: str
-    password: str
-
-
 class UserAuthenticate(PydanticModel):
-    email: str
+    email: EmailStr
     password: str

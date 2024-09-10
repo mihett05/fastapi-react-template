@@ -1,4 +1,4 @@
-from auth.models import User
+from users.models import User
 from auth.schemas import UserRead
 from core.mappers import sqlalchemy_retort
 
