@@ -4,26 +4,18 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from auth import consts
-from auth.deps import get_tokens, extract_refresh_token, get_current_user
-from auth.mappers import user_mapper
+from auth.deps import get_tokens, extract_refresh_token
 from auth.schemas import UserWithToken, UserAuthenticate
 from auth.tokens import TokensGateway
 from auth.tokens.dtos import TokenInfo
 from auth.usecases import authenticate_user, authorize_user, create_token_pair
 from users.deps import get_security, get_users_repository
-from users.models import User
+from users.mappers import user_mapper
 from users.repository import UsersRepository
-from users.schemas import UserRead, UserCreate
+from users.schemas import UserCreate
 from users.security import SecurityGateway
 
 router = APIRouter()
-
-
-@router.get("/me", response_model=UserRead)
-async def get_user(
-        user: Annotated[User, Depends(get_current_user)],
-):
-    return JSONResponse(content=user_mapper(user).model_dump(by_alias=True))
 
 
 @router.post("/login", response_model=UserWithToken)
