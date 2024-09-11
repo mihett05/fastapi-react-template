@@ -21,12 +21,12 @@ class MessagesRepository:
         raise MessageNotFound()
 
     async def get_by_chat(self, chat_id: int) -> list[Message]:
-        if messages := await self.session.get(select(Message).where(Message.chat_id == chat_id)):
+        if messages := await self.session.scalars(select(Message).where(Message.chat_id == chat_id)):
             return messages
         raise MessageNotFound()
 
     async def get_by_user(self, user_id: int) -> list[Message]:
-        if messages := await self.session.get(
+        if messages := await self.session.scalars(
                 select(Message).where(Message.user_to_id == user_id or Message.user_to_id == user_id)):
             return messages
         raise MessageNotFound()
@@ -67,6 +67,5 @@ class ChatsRepository:
         return model
 
     async def delete(self, chat: Chat):
-        await self.session.delete(select(Message).where(Message.chat_id == chat.id))
         await self.session.delete(chat)
         await self.session.commit()
