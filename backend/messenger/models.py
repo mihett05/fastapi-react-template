@@ -10,7 +10,10 @@ class Chat(Base):
     __tablename__ = "chats"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    contract_id: Mapped[int] = mapped_column(unique=True)
+
+    contract_id: Mapped[int] = mapped_column(
+        ForeignKey("contracts.id", ondelete="cascade"), unique=True
+    )
     messages: Mapped[list["Message"]] = relationship("Message", cascade="all, delete-orphan")
 
 

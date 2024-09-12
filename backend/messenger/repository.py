@@ -2,6 +2,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from contract.models import Contract
 from messenger.models import Message, Chat
 from messenger.schemas import MessageCreate, ChatCreate
 from .exceptions import MessageNotFound, ChatNotFound
@@ -64,8 +65,18 @@ class ChatsRepository:
 
     async def add(self, chat: ChatCreate) -> Chat:
         model = Chat(messages=[], contract_id=chat.contract_id)
+
         self.session.add(model)
         await self.session.commit()
+
+        return model
+
+    async def add_by_contract(self, contract: Contract) -> Chat:
+        model = Chat(messages=[], contract_id=contract.id)
+
+        self.session.add(model)
+        await self.session.commit()
+
         return model
 
     async def delete(self, chat: Chat):
