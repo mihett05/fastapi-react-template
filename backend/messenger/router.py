@@ -39,5 +39,5 @@ async def delete_chat(
 
 
 @router.put("/chat/{chat_id}", response_model="str")
-async def refresh_chat():
+async def update_chat():
     pass

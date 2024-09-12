@@ -2,10 +2,12 @@ from messenger.models import Message, Chat
 from messenger.schemas import MessageRead, ChatRead
 from core.mappers import sqlalchemy_retort
 
-messages_mapper = sqlalchemy_retort.extend(recipe=[])
+retort = sqlalchemy_retort.extend(recipe=[])
 
-message_mapper = messages_mapper.get_converter(Message, MessageRead)
+messages_mapper = retort
 
-chats_mapper = sqlalchemy_retort.extend(recipe=[])
+message_mapper = retort.get_converter(Message, MessageRead)
 
-chat_mapper = messages_mapper.get_converter(Chat, ChatRead)
+chats_mapper = retort
+
+chat_mapper = retort.get_converter(Chat, ChatRead)

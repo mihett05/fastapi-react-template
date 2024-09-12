@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -28,7 +28,7 @@ class MessagesRepository:
 
     async def get_by_user(self, user_id: int) -> list[Message]:
         if messages := await self.session.scalars(
-                select(Message).where(Message.receiver_id == user_id or Message.sender_id == user_id)):
+                select(Message).where(or_(Message.receiver_id == user_id, Message.sender_id == user_id))):
             return messages
         raise MessageNotFound()
 
