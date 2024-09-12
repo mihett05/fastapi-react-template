@@ -9,10 +9,10 @@ from users.security.dtos import PasswordDto
 
 
 async def authenticate_user(
-        dto: UserAuthenticate,
-        *,
-        users_repository: UsersRepository,
-        security_gateway: SecurityGateway,
+    dto: UserAuthenticate,
+    *,
+    users_repository: UsersRepository,
+    security_gateway: SecurityGateway,
 ) -> User:
     try:
         user = await users_repository.get_by_email(dto.email)
@@ -27,9 +27,9 @@ async def authenticate_user(
 
 
 async def authorize_user(
-        dto: TokenInfo,
-        *,
-        users_repository: UsersRepository,
+    dto: TokenInfo,
+    *,
+    users_repository: UsersRepository,
 ) -> User:
     try:
         return await users_repository.get_by_email(dto.subject)

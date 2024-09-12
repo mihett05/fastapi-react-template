@@ -1,7 +1,22 @@
-from users.models import User
+from typing import Optional
+
+from adaptix.conversion import coercer
+
+from users.models import User, Profile
 from auth.schemas import UserRead
 from core.mappers import sqlalchemy_retort
+from users.schemas import ProfileRead
 
-users_mapper = sqlalchemy_retort.extend(recipe=[])
+retort = sqlalchemy_retort.extend(recipe=[])
 
-user_mapper = users_mapper.get_converter(User, UserRead)
+profile_mapper_default = retort.get_converter(Profile, ProfileRead)
+profile_mapper_nullable = retort.get_converter(Optional[Profile], Optional[ProfileRead])
+
+user_mapper = retort.get_converter(
+    User,
+    UserRead,
+    recipe=[
+        coercer(Profile, ProfileRead, profile_mapper_default),
+        coercer(Optional[Profile], Optional[ProfileRead], profile_mapper_nullable),
+    ],
+)
