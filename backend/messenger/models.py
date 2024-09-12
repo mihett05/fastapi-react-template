@@ -14,7 +14,9 @@ class Chat(Base):
     contract_id: Mapped[int] = mapped_column(
         ForeignKey("contracts.id", ondelete="cascade"), unique=True
     )
-    messages: Mapped[list["Message"]] = relationship("Message", cascade="all, delete-orphan")
+    messages: Mapped[list["Message"]] = relationship(
+        "Message", cascade="all, delete-orphan"
+    )
 
 
 class Message(Base):

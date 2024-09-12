@@ -19,5 +19,7 @@ async def update_profile_usc(
     return await profile_repository.update(dto, user)
 
 
-async def delete_profile_usc(user: User, *, profile_repository: ProfilesRepository) -> Profile:
+async def delete_profile_usc(
+    user: User, *, profile_repository: ProfilesRepository
+) -> Profile:
     return await profile_repository.delete(user)

@@ -31,7 +31,10 @@ def upgrade() -> None:
         sa.Column("ogrn", sa.String(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["users.id"], name=op.f("fk_profiles_user_id_users"), ondelete="cascade"
+            ["user_id"],
+            ["users.id"],
+            name=op.f("fk_profiles_user_id_users"),
+            ondelete="cascade",
         ),
         sa.PrimaryKeyConstraint("user_id", name=op.f("pk_profiles")),
         sa.UniqueConstraint("contact_phone", name=op.f("uq_profiles_contact_phone")),

@@ -18,7 +18,9 @@ router = APIRouter()
 @router.get("/contract/{contract_id}", response_model=ContractRead)
 async def get_contract(
     contract_id: int,
-    contracts_repository: Annotated[ContractsRepository, Depends(get_contracts_repository)],
+    contracts_repository: Annotated[
+        ContractsRepository, Depends(get_contracts_repository)
+    ],
     user: Annotated[User, Depends(get_current_user)],
 ):
     return contract_mapper(await contracts_repository.get(contract_id))
@@ -28,7 +30,9 @@ async def get_contract(
 async def create_contract(
     dto: ContractCreate,
     chat_repository: Annotated[ChatsRepository, Depends(get_chats_repository)],
-    contract_repository: Annotated[ContractsRepository, Depends(get_contracts_repository)],
+    contract_repository: Annotated[
+        ContractsRepository, Depends(get_contracts_repository)
+    ],
     user: Annotated[User, Depends(get_current_user)],
 ):
     contract = await contract_repository.add(dto, user)
@@ -41,7 +45,9 @@ async def create_contract(
 @router.delete("/contract/{contract_id}", response_model=ContractRead)
 async def delete_contract(
     contract_id: int,
-    contract_repository: Annotated[ContractsRepository, Depends(get_contracts_repository)],
+    contract_repository: Annotated[
+        ContractsRepository, Depends(get_contracts_repository)
+    ],
     user: Annotated[User, Depends(get_current_user)],
 ):
     contract = await contract_repository.get(contract_id)
@@ -52,7 +58,9 @@ async def delete_contract(
 @router.patch("/contract/{contract_id}", response_model=ContractRead)
 async def update_contract(
     contract_id: int,
-    contract_repository: Annotated[ContractsRepository, Depends(get_contracts_repository)],
+    contract_repository: Annotated[
+        ContractsRepository, Depends(get_contracts_repository)
+    ],
     user: Annotated[User, Depends(get_current_user)],
 ):
     contract = await contract_repository.get(contract_id)

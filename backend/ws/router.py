@@ -42,4 +42,6 @@ async def websocket_endpoint(
                 user_data = resp
 
         except (ValidationError, ValueError) as err:
-            await websocket.send_json({"error": f"Invalid request\nMore Info:\n({err})"})
+            await websocket.send_json(
+                {"error": f"Invalid request\nMore Info:\n({err})"}
+            )

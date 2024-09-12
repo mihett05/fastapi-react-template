@@ -31,7 +31,9 @@ class MessagesRepository:
 
     async def get_by_user(self, user_id: int) -> list[Message]:
         if messages := await self.session.scalars(
-            select(Message).where(or_(Message.receiver_id == user_id, Message.sender_id == user_id))
+            select(Message).where(
+                or_(Message.receiver_id == user_id, Message.sender_id == user_id)
+            )
         ):
             return messages
         raise MessageNotFound()
@@ -59,7 +61,9 @@ class ChatsRepository:
         self.session = session
 
     async def get(self, chat_id: int) -> Chat:
-        if chat := await self.session.get(Chat, chat_id, options=[selectinload(Chat.messages)]):
+        if chat := await self.session.get(
+            Chat, chat_id, options=[selectinload(Chat.messages)]
+        ):
             return chat
         raise ChatNotFound()
 

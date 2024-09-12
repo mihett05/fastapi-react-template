@@ -35,8 +35,12 @@ def upgrade() -> None:
         sa.Column("message_text", sa.String(), nullable=False),
         sa.Column("sender_id", sa.Integer(), nullable=False),
         sa.Column("receiver_id", sa.Integer(), nullable=False),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(["chat_id"], ["chats.id"], name=op.f("fk_messages_chat_id_chats")),
+        sa.Column(
+            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+        ),
+        sa.ForeignKeyConstraint(
+            ["chat_id"], ["chats.id"], name=op.f("fk_messages_chat_id_chats")
+        ),
         sa.ForeignKeyConstraint(
             ["receiver_id"], ["users.id"], name=op.f("fk_messages_receiver_id_users")
         ),

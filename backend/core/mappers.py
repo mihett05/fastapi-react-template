@@ -9,4 +9,6 @@ def convert_datetime(dt: datetime) -> datetime:
     return dt.replace(tzinfo=None)  # datetime - time aware (из pydantic)
 
 
-sqlalchemy_retort = ConversionRetort(recipe=[coercer(datetime, datetime, convert_datetime)])
+sqlalchemy_retort = ConversionRetort(
+    recipe=[coercer(datetime, datetime, convert_datetime)]
+)

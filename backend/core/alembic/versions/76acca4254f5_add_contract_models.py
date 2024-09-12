@@ -27,11 +27,19 @@ def upgrade() -> None:
         sa.Column("customer_id", sa.Integer(), nullable=False),
         sa.Column("contractor_id", sa.Integer(), nullable=False),
         sa.Column("chat_id", sa.Integer(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(["chat_id"], ["chats.id"], name=op.f("fk_contracts_chat_id_chats")),
+        sa.Column(
+            "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+        ),
+        sa.Column(
+            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+        ),
         sa.ForeignKeyConstraint(
-            ["contractor_id"], ["users.id"], name=op.f("fk_contracts_contractor_id_users")
+            ["chat_id"], ["chats.id"], name=op.f("fk_contracts_chat_id_chats")
+        ),
+        sa.ForeignKeyConstraint(
+            ["contractor_id"],
+            ["users.id"],
+            name=op.f("fk_contracts_contractor_id_users"),
         ),
         sa.ForeignKeyConstraint(
             ["customer_id"], ["users.id"], name=op.f("fk_contracts_customer_id_users")

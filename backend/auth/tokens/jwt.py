@@ -16,7 +16,8 @@ class JwtTokensGateway(TokensGateway):
     async def create_token_pair(self, subject: str) -> TokenPairDto:
         access_token = jwt.encode(
             {
-                "exp": datetime.now(tz=timezone.utc) + self.config.access_token_expires_time,
+                "exp": datetime.now(tz=timezone.utc)
+                + self.config.access_token_expires_time,
                 "sub": subject,
             },
             key=self.config.secret_key,
@@ -24,7 +25,8 @@ class JwtTokensGateway(TokensGateway):
         )
         refresh_token = jwt.encode(
             {
-                "exp": datetime.now(tz=timezone.utc) + self.config.refresh_token_expires_time,
+                "exp": datetime.now(tz=timezone.utc)
+                + self.config.refresh_token_expires_time,
                 "sub": subject,
             },
             key=self.config.secret_key,
@@ -35,7 +37,9 @@ class JwtTokensGateway(TokensGateway):
             refresh_token=refresh_token,
         )
 
-    async def extract_token_info(self, token: str, check_expires: bool = True) -> TokenInfo:
+    async def extract_token_info(
+        self, token: str, check_expires: bool = True
+    ) -> TokenInfo:
         try:
             payload = jwt.decode(
                 token,

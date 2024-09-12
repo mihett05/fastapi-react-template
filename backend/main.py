@@ -27,10 +27,14 @@ async def entity_not_found_exception_handler(request: Request, exc: EntityNotFou
 
 
 @app.exception_handler(InvalidCredentials)
-async def invalid_credentials_exception_handler(request: Request, exc: InvalidCredentials):
+async def invalid_credentials_exception_handler(
+    request: Request, exc: InvalidCredentials
+):
     return JSONResponse(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        content={"message": exc.args[0] if exc.args else "Invalid credentials were provided"},
+        content={
+            "message": exc.args[0] if exc.args else "Invalid credentials were provided"
+        },
     )
 
 

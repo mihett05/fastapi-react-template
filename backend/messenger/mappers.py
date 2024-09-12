@@ -14,5 +14,7 @@ chat_mapper = retort.get_converter(
     Chat, ChatRead, recipe=[coercer(Message, MessageRead, message_mapper)]
 )
 chat_mapper_nullable = retort.get_converter(
-    Optional[Chat], Optional[ChatRead], recipe=[coercer(Message, MessageRead, message_mapper)]
+    Optional[Chat],
+    Optional[ChatRead],
+    recipe=[coercer(Message, MessageRead, message_mapper)],
 )

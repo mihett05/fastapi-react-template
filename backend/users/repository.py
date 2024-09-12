@@ -14,19 +14,25 @@ class UsersRepository:
         self.security_gateway = security_gateway
 
     async def get(self, user_id: int) -> User:
-        if user := await self.session.get(User, user_id, options=[selectinload(User.profile)]):
+        if user := await self.session.get(
+            User, user_id, options=[selectinload(User.profile)]
+        ):
             return user
         raise UserNotFound()
 
     async def get_by_email(self, email: str) -> User:
-        query = select(User).where(User.email == email).options(selectinload(User.profile))
+        query = (
+            select(User).where(User.email == email).options(selectinload(User.profile))
+        )
 
         if user := await self.session.scalar(query):
             return user
         raise UserNotFound()
 
     async def add(self, user_create: UserCreate) -> User:
-        password_with_salt = self.security_gateway.create_hashed_password(user_create.password)
+        password_with_salt = self.security_gateway.create_hashed_password(
+            user_create.password
+        )
         model = User(
             email=user_create.email,
             hashed_password=password_with_salt.hashed_password,

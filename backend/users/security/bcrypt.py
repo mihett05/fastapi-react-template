@@ -15,9 +15,13 @@ class BcryptSecurityGateway(SecurityGateway):
 
     def create_hashed_password(self, password: str) -> PasswordDto:
         salt = self.create_salt()
-        return PasswordDto(hashed_password=self.pwd_context.hash(password + salt), salt=salt)
+        return PasswordDto(
+            hashed_password=self.pwd_context.hash(password + salt), salt=salt
+        )
 
-    def verify_passwords(self, plain_password: str, hashed_password: PasswordDto) -> bool:
+    def verify_passwords(
+        self, plain_password: str, hashed_password: PasswordDto
+    ) -> bool:
         return self.pwd_context.verify(
             plain_password + hashed_password.salt, hashed_password.hashed_password
         )
