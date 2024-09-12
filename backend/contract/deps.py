@@ -8,6 +8,6 @@ from core.deps import get_session
 
 
 async def get_contracts_repository(
-        session: Annotated[AsyncSession, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> ContractsRepository:
     return ContractsRepository(session)

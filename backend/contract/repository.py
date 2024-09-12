@@ -2,9 +2,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from contract.exceptions import ContractNotFound
-
 from contract.models import Contract
 from contract.schemas import ContractCreate
+from users.models import User
 
 
 class ContractsRepository:
@@ -13,22 +13,24 @@ class ContractsRepository:
         self.session = session
 
     async def get(self, contract_id: int) -> Contract:
-        if contract := await self.session.get(Contract, contract_id, options=[selectinload(Contract.chat, Contract.customer, Contract.contractor)]):
+        if contract := await self.session.get(
+            Contract,
+            contract_id,
+            options=[
+                selectinload(Contract.chat),
+                selectinload(Contract.customer),
+                selectinload(Contract.contractor),
+            ],
+        ):
             return contract
         raise ContractNotFound()
 
-    async def add(self, contract: ContractCreate) -> Contract:
-        model = Contract(
-            customer_id=contract.customer_id,
-            contractor_id=contract.contractor_id,
-            chat_id=contract.chat_id,
-        )
+    async def add(self, dto: ContractCreate, user: User) -> Contract:
+        model = Contract(customer_id=user.id, contractor_id=dto.contractor_id)
         self.session.add(model)
         await self.session.commit()
-        model.chat = None
-        model.contractor = None
-        model.customer = None
-        return model
+
+        return await self.get(model.id)
 
     async def delete(self, contract: Contract):
         await self.session.delete(contract)
