@@ -1,10 +1,11 @@
-from auth.exceptions import InvalidCredentials, UserNotFound
-from auth.models import User
-from auth.repository import UsersRepository
+from auth.exceptions import InvalidCredentials
+from users.models import User
 from auth.schemas import UserAuthenticate
-from auth.security import SecurityGateway
-from auth.security.dtos import PasswordDto
 from auth.tokens.dtos import TokenInfo
+from users.exceptions import UserNotFound
+from users.repository import UsersRepository
+from users.security import SecurityGateway
+from users.security.dtos import PasswordDto
 
 
 async def authenticate_user(

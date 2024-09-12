@@ -1,4 +1,4 @@
-from auth.models import User
+from users.models import User
 from auth.tokens.dtos import TokenPairDto
 from auth.tokens.gateway import TokensGateway
 
