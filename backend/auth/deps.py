@@ -7,6 +7,7 @@ from auth import consts
 from auth.tokens.dtos import TokenInfo
 from auth.tokens.gateway import TokensGateway
 from config import get_config
+
 from users.deps import get_users_repository
 from users.models import User
 from users.repository import UsersRepository
@@ -38,6 +39,6 @@ async def extract_refresh_token(
 
 async def get_current_user(
         token: Annotated[TokenInfo, Depends(extract_access_token)],
-        users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+        users_repository: Annotated[UsersRepository, Depends(get_users_repository)]
 ) -> User:
     return await authorize_user(token, users_repository=users_repository)

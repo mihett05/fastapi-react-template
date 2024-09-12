@@ -65,7 +65,7 @@ async def register_user(
 async def refresh_token(
         users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
         tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
-        token_info: TokenInfo = Depends(extract_refresh_token)):
+        token_info: Annotated[TokenInfo, Depends(extract_refresh_token)]):
     user = await authorize_user(
         token_info,
         users_repository=users_repository,
