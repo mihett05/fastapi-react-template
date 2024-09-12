@@ -5,25 +5,6 @@ from pydantic import EmailStr
 from core.pydantic import PydanticModel
 
 
-class UserRead(PydanticModel):
-    id: int
-    email: str
-    is_active: bool
-    is_superuser: bool
-
-    # profile: Optional['ProfileRead'] = None
-
-
-class UserCreate(PydanticModel):
-    email: EmailStr
-    password: str
-
-
-class UserUpdate(PydanticModel):
-    email: EmailStr
-    password: str
-
-
 class ProfileCreate(PydanticModel):
     org_name: str
     contact_phone: str
@@ -45,7 +26,6 @@ class ProfileRead(PydanticModel):
 
 
 class ProfileUpdate(PydanticModel):
-    id: int
     org_name: Optional[str]
     contact_phone: Optional[str]
     ceo_fullname: Optional[str]
@@ -56,3 +36,22 @@ class ProfileUpdate(PydanticModel):
 
 class ProfileDelete(PydanticModel):
     id: int
+
+
+class UserRead(PydanticModel):
+    id: int
+    email: str
+    is_active: bool
+    is_superuser: bool
+
+    profile: Optional[ProfileCreate]
+
+
+class UserCreate(PydanticModel):
+    email: EmailStr
+    password: str
+
+
+class UserUpdate(PydanticModel):
+    email: EmailStr
+    password: str

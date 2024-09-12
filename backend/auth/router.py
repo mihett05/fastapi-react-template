@@ -25,11 +25,14 @@ async def login_user(
         security_gateway: Annotated[SecurityGateway, Depends(get_security)],
         tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ):
+
     user = await authenticate_user(
         auth_data,
         users_repository=users_repository,
         security_gateway=security_gateway,
     )
+
+    print(user, await user.profile)
 
     tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
 
@@ -48,6 +51,7 @@ async def register_user(
         dto: UserCreate,
         users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
         tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)], ):
+    # TODO вынести в usecases
     user = await users_repository.add(dto)
     tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
 

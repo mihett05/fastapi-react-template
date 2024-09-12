@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -15,7 +17,7 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
 
-    # profile: Mapped["Profile"] = relationship()
+    profile: Mapped[Optional["Profile"]] = relationship('Profile', uselist=False)
 
 
 class Profile(Base):
