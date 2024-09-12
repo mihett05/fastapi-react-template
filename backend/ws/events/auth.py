@@ -24,13 +24,12 @@ class UpdateAuthResponse(Response):
 
 @auth_handler.handler
 async def handle(
-        sender: SendResponse,
-        websocket: WebSocket,
-        request: UpdateAuthRequest,
-        manager: ConnectionManager,
-
-        tokens_gateway: TokensGateway,
-        users_repository: UsersRepository,
+    sender: SendResponse,
+    websocket: WebSocket,
+    request: UpdateAuthRequest,
+    manager: ConnectionManager,
+    tokens_gateway: TokensGateway,
+    users_repository: UsersRepository,
 ):
     info = await tokens_gateway.extract_token_info(request.access_token)
     user = await users_repository.get_by_email(info.subject)

@@ -47,19 +47,21 @@ class EventHandler:
         return func
 
     async def run(
-            self,
-            data: dict,
-            event: EventType,
-            websocket: WebSocket,
-            manager: ConnectionManager,
-            tokens_gateway: TokensGateway,
-            users_repository: UsersRepository,
-            user_data: Optional[WSUserData] = None,
+        self,
+        data: dict,
+        event: EventType,
+        websocket: WebSocket,
+        manager: ConnectionManager,
+        tokens_gateway: TokensGateway,
+        users_repository: UsersRepository,
+        user_data: Optional[WSUserData] = None,
     ):
         if event != self.type:
             return
 
-        if event != EventType.AUTH and (user_data is None or manager.is_user_authenticated(user_data.user)):
+        if event != EventType.AUTH and (
+            user_data is None or manager.is_user_authenticated(user_data.user)
+        ):
             raise ValueError(f"Permission denied (user should be authorized)")
 
         if not self.request_type or not issubclass(self.request_type, (Request,)):
@@ -74,7 +76,6 @@ class EventHandler:
             WSUserData: user_data,
             SendResponse: send_response,
             ConnectionManager: manager,
-
             TokensGateway: tokens_gateway,
             UsersRepository: users_repository,
         }

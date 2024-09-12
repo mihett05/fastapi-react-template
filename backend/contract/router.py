@@ -45,7 +45,7 @@ async def delete_contract(
     user: Annotated[User, Depends(get_current_user)],
 ):
     contract = await contract_repository.get(contract_id)
-    await contract_repository.delete(contract)  
+    await contract_repository.delete(contract)
     return contract_mapper(contract)
 
 

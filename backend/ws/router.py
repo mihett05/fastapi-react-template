@@ -17,9 +17,9 @@ connect_manager = ConnectionManager()
 
 @router.websocket("/ws")
 async def websocket_endpoint(
-        websocket: WebSocket,
-        tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
-        users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+    websocket: WebSocket,
+    tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+    users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
 ):
     await websocket.accept()
 
@@ -35,7 +35,6 @@ async def websocket_endpoint(
                 manager=connect_manager,
                 websocket=websocket,
                 user_data=user_data,
-
                 tokens_gateway=tokens_gateway,
                 users_repository=users_repository,
             )
