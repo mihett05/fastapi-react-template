@@ -61,7 +61,7 @@ async def register_user(
     return response
 
 
-@router.post("/refresh", response_model=str)
+@router.post("/refresh", response_model=UserWithToken)
 async def refresh_token(
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
