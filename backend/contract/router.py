@@ -32,9 +32,9 @@ async def create_contract(
     user: Annotated[User, Depends(get_current_user)],
 ):
     contract = await contract_repository.add(dto, user)
-    chat = await chat_repository.add(ChatCreate(contract_id=contract.id))
+    chat = await chat_repository.add_by_contract(contract)
     contract.chat = chat
-    print(contract)
+
     return contract_mapper(contract)
 
 
@@ -45,7 +45,7 @@ async def delete_contract(
     user: Annotated[User, Depends(get_current_user)],
 ):
     contract = await contract_repository.get(contract_id)
-    await contract_repository.delete(contract)
+    await contract_repository.delete(contract)  
     return contract_mapper(contract)
 
 
