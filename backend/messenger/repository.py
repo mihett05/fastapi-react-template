@@ -22,13 +22,16 @@ class MessagesRepository:
         raise MessageNotFound()
 
     async def get_by_chat(self, chat_id: int) -> list[Message]:
-        if messages := await self.session.scalars(select(Message).where(Message.chat_id == chat_id)):
+        if messages := await self.session.scalars(
+            select(Message).where(Message.chat_id == chat_id)
+        ):
             return messages
         raise MessageNotFound()
 
     async def get_by_user(self, user_id: int) -> list[Message]:
         if messages := await self.session.scalars(
-                select(Message).where(or_(Message.receiver_id == user_id, Message.sender_id == user_id))):
+            select(Message).where(or_(Message.receiver_id == user_id, Message.sender_id == user_id))
+        ):
             return messages
         raise MessageNotFound()
 
@@ -38,7 +41,7 @@ class MessagesRepository:
             receiver_id=message.receiver_id,
             sender_id=message.sender_id,
             message_text=message.message_text,
-            created_at=datetime.fromtimestamp(time.time())
+            created_at=datetime.fromtimestamp(time.time()),
         )
         self.session.add(model)
         await self.session.commit()
@@ -60,10 +63,7 @@ class ChatsRepository:
         raise ChatNotFound()
 
     async def add(self, chat: ChatCreate) -> Chat:
-        model = Chat(
-            messages=[],
-            contract_id=chat.contract_id
-        )
+        model = Chat(messages=[], contract_id=chat.contract_id)
         self.session.add(model)
         await self.session.commit()
         return model

@@ -7,11 +7,15 @@ async def get_profile_usc(user: User) -> Profile:
     return await ProfilesRepository.get_by_user(user)
 
 
-async def create_profile_usc(dto: ProfileCreate, user: User, *, profile_repository: ProfilesRepository) -> Profile:
+async def create_profile_usc(
+    dto: ProfileCreate, user: User, *, profile_repository: ProfilesRepository
+) -> Profile:
     return await profile_repository.add(dto, user)
 
 
-async def update_profile_usc(dto: ProfileUpdate, user: User, *, profile_repository: ProfilesRepository) -> Profile:
+async def update_profile_usc(
+    dto: ProfileUpdate, user: User, *, profile_repository: ProfilesRepository
+) -> Profile:
     return await profile_repository.update(dto, user)
 
 

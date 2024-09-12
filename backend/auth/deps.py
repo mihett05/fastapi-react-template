@@ -1,7 +1,12 @@
 from typing import Annotated
 
 from fastapi import Depends, Cookie
-from fastapi.security import OAuth2PasswordBearer, APIKeyCookie, HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    APIKeyCookie,
+    HTTPBearer,
+    HTTPAuthorizationCredentials,
+)
 
 from auth import consts
 from auth.tokens.dtos import TokenInfo
@@ -24,21 +29,21 @@ async def get_tokens() -> TokensGateway:
 
 
 async def extract_access_token(
-        token: Annotated[HTTPAuthorizationCredentials, Depends(http_scheme)],
-        tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+    token: Annotated[HTTPAuthorizationCredentials, Depends(http_scheme)],
+    tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ) -> TokenInfo:
     return await tokens_gateway.extract_token_info(token.credentials)
 
 
 async def extract_refresh_token(
-        tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
-        cookie: Annotated[str | None, Cookie(alias=consts.REFRESH_COOKIE)],
+    tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+    cookie: Annotated[str | None, Cookie(alias=consts.REFRESH_COOKIE)],
 ) -> TokenInfo:
     return await tokens_gateway.extract_token_info(cookie)
 
 
 async def get_current_user(
-        token: Annotated[TokenInfo, Depends(extract_access_token)],
-        users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+    token: Annotated[TokenInfo, Depends(extract_access_token)],
+    users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
 ) -> User:
     return await authorize_user(token, users_repository=users_repository)

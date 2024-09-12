@@ -11,7 +11,7 @@ class Chat(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     contract_id: Mapped[int] = mapped_column(unique=True)
-    messages: Mapped[list["Message"]] = relationship('Message', cascade='all, delete-orphan')
+    messages: Mapped[list["Message"]] = relationship("Message", cascade="all, delete-orphan")
 
 
 class Message(Base):

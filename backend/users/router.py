@@ -9,7 +9,12 @@ from users.mappers import user_mapper, profile_mapper_default as profile_mapper
 from users.models import User
 from users.repository import ProfilesRepository
 from users.schemas import ProfileRead, ProfileCreate, ProfileUpdate
-from users.usecases.profiles import create_profile_usc, update_profile_usc, delete_profile_usc, get_profile_usc
+from users.usecases.profiles import (
+    create_profile_usc,
+    update_profile_usc,
+    delete_profile_usc,
+    get_profile_usc,
+)
 
 router = APIRouter()
 

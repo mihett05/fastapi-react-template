@@ -8,6 +8,6 @@ from messenger.repository import ChatsRepository
 
 
 async def get_chats_repository(
-        session: Annotated[AsyncSession, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> ChatsRepository:
     return ChatsRepository(session)

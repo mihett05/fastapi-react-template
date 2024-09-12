@@ -30,4 +30,6 @@ class Profile(Base):
     kpp: Mapped[str]
     ogrn: Mapped[str]
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="cascade"), primary_key=True, unique=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="cascade"), primary_key=True, unique=True
+    )
