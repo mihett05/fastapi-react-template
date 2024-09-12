@@ -22,10 +22,12 @@ class ContractsRepository:
             customer_id=contract.customer_id,
             contractor_id=contract.contractor_id,
             chat_id=contract.chat_id,
-            chat=contract.chat
         )
         self.session.add(model)
         await self.session.commit()
+        model.chat = None
+        model.contractor = None
+        model.customer = None
         return model
 
     async def delete(self, contract: Contract):

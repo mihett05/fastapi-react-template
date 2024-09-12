@@ -6,6 +6,7 @@ from core.sqlalchemy import Base
 from datetime import datetime
 
 from messenger.models import Chat
+from users.models import User
 
 
 class Contract(Base):
@@ -19,5 +20,6 @@ class Contract(Base):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
 
     chat: Mapped[Chat] = relationship(uselist=False)
-    customer: Mapped[Chat] = relationship(uselist=False)
-    contractor: Mapped[Chat] = relationship(uselist=False)
+    customer: Mapped[User] = relationship(uselist=False, foreign_keys='Contract.customer_id')
+    contractor: Mapped[User] = relationship(uselist=False, foreign_keys='Contract.contractor_id')
+

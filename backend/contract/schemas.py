@@ -8,7 +8,6 @@ class ContractCreate(PydanticModel):
     customer_id: int
     contractor_id: int
     chat_id: int
-    chat: ChatRead
 
 
 class ContractRead(PydanticModel):
