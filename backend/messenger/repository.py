@@ -1,9 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from messenger.models import Message, Chat
 from messenger.schemas import MessageCreate, ChatCreate
-from .exceptions import MessageNotFound
+from .exceptions import MessageNotFound, ChatNotFound
 
 import time
 
@@ -27,15 +28,15 @@ class MessagesRepository:
 
     async def get_by_user(self, user_id: int) -> list[Message]:
         if messages := await self.session.scalars(
-                select(Message).where(Message.user_to_id == user_id or Message.user_to_id == user_id)):
+                select(Message).where(Message.receiver_id == user_id or Message.sender_id == user_id)):
             return messages
         raise MessageNotFound()
 
     async def add(self, message: MessageCreate) -> Message:
         model = Message(
             chat_id=message.chat_id,
-            user_to_id=message.user_to_id,
-            user_from_id=message.user_from_id,
+            receiver_id=message.receiver_id,
+            sender_id=message.sender_id,
             message_text=message.message_text,
             created_at=datetime.fromtimestamp(time.time())
         )
@@ -54,12 +55,13 @@ class ChatsRepository:
         self.session = session
 
     async def get(self, chat_id: int) -> Chat:
-        if chat := await self.session.get(Chat, chat_id):
+        if chat := await self.session.get(Chat, chat_id, options=[selectinload(Chat.messages)]):
             return chat
-        raise MessageNotFound()
+        raise ChatNotFound()
 
     async def add(self, chat: ChatCreate) -> Chat:
         model = Chat(
+            messages=[],
             contract_id=chat.contract_id
         )
         self.session.add(model)

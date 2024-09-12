@@ -1,5 +1,5 @@
 from core.pydantic import PydanticModel
-from models import Chat, Message
+from messenger.models import Chat, Message
 
 
 class MessageCreate(PydanticModel):
@@ -12,15 +12,15 @@ class MessageCreate(PydanticModel):
 class MessageRead(PydanticModel):
     id: int
     chat_id: int
-    user_to_id: int
-    user_from_id: int
+    receiver_id: int
+    sender_id: int
     message_text: str
 
 
 class ChatRead(PydanticModel):
     id: int
     contract_id: int
-    messages: list[Message]
+    messages: list[MessageRead]
 
 
 class ChatCreate(PydanticModel):
