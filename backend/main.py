@@ -15,9 +15,7 @@ def custom_generate_unique_id(route: APIRoute):
         return route.name
 
 
-app = FastAPI(
-    docs_url="/docs",
-    generate_unique_id_function=custom_generate_unique_id)
+app = FastAPI(docs_url="/docs", generate_unique_id_function=custom_generate_unique_id)
 
 
 @app.exception_handler(EntityNotFound)
@@ -30,7 +28,7 @@ async def entity_not_found_exception_handler(request: Request, exc: EntityNotFou
 
 @app.exception_handler(InvalidCredentials)
 async def invalid_credentials_exception_handler(
-        request: Request, exc: InvalidCredentials
+    request: Request, exc: InvalidCredentials
 ):
     return JSONResponse(
         status_code=status.HTTP_401_UNAUTHORIZED,
