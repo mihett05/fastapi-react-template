@@ -1,9 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from users.models import User, Profile
 from users.schemas import UserCreate, ProfileCreate, ProfileUpdate
-
 from .exceptions import UserNotFound, ProfileNotFound
 from .security import SecurityGateway
 
@@ -14,23 +14,24 @@ class UsersRepository:
         self.security_gateway = security_gateway
 
     async def get(self, user_id: int) -> User:
-        if user := await self.session.get(User, user_id):
+        if user := await self.session.get(User, user_id, options=[selectinload(User.profile)]):
             return user
         raise UserNotFound()
 
     async def get_by_email(self, email: str) -> User:
-        if user := await self.session.scalar(select(User).where(User.email == email)):
+        query = select(User).where(User.email == email).options(selectinload(User.profile))
+
+        if user := await self.session.scalar(query):
             return user
         raise UserNotFound()
 
     async def add(self, user_create: UserCreate) -> User:
-        password_with_salt = self.security_gateway.create_hashed_password(
-            user_create.password
-        )
+        password_with_salt = self.security_gateway.create_hashed_password(user_create.password)
         model = User(
             email=user_create.email,
             hashed_password=password_with_salt.hashed_password,
             salt=password_with_salt.salt,
+            profile=None,
         )
         self.session.add(model)
         await self.session.commit()
@@ -39,7 +40,6 @@ class UsersRepository:
     async def update(self, user: User):
         self.session.add(user)
         await self.session.commit()
-        # TODO: мб рефреш ещё сделать?
 
     async def delete(self, user: User):
         await self.session.delete(user)
@@ -49,6 +49,12 @@ class UsersRepository:
 class ProfilesRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    @staticmethod
+    async def get_by_user(user: User) -> Profile:
+        if profile := user.profile:
+            return profile
+        raise ProfileNotFound()
 
     async def get(self, profile_id: int) -> Profile:
         if profile := await self.session.get(Profile, profile_id):
@@ -63,7 +69,7 @@ class ProfilesRepository:
             ceo_fullname=dto.ceo_fullname,
             inn=dto.inn,
             kpp=dto.kpp,
-            ogrn=dto.orgn
+            ogrn=dto.ogrn,
         )
 
         self.session.add(model)
@@ -73,16 +79,16 @@ class ProfilesRepository:
     async def update(self, dto: ProfileUpdate, user: User) -> Profile:
         model = user.profile
 
-        model.org_name = dto.org_name or model.org_name
-        model.contact_phone = dto.contact_phone or model.contact_phone
-        model.ceo_fullname = dto.ceo_fullname or model.ceo_fullname
-        model.inn = dto.inn or model.inn
-        model.kpp = dto.kpp or model.kpp
-        model.ogrn = dto.orgn or model.ogrn
+        attrs = dto.model_dump().keys()
+        for attr in attrs:
+            setattr(model, attr, getattr(dto, attr) or getattr(model, attr))
 
         await self.session.commit()
         return model
 
     async def delete(self, user: User):
+        profile = user.profile
         await self.session.delete(user.profile)
         await self.session.commit()
+
+        return profile

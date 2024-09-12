@@ -20,10 +20,10 @@ router = APIRouter()
 
 @router.post("/login", response_model=UserWithToken)
 async def login_user(
-        auth_data: UserAuthenticate,
-        users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
-        security_gateway: Annotated[SecurityGateway, Depends(get_security)],
-        tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+    auth_data: UserAuthenticate,
+    users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+    security_gateway: Annotated[SecurityGateway, Depends(get_security)],
+    tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ):
 
     user = await authenticate_user(
@@ -32,15 +32,10 @@ async def login_user(
         security_gateway=security_gateway,
     )
 
-    print(user, await user.profile)
-
     tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
 
     response = JSONResponse(
-        content=UserWithToken(
-            user=user_mapper(user),
-            access_token=tokens_pair.access_token
-        ).model_dump(by_alias=True),
+        content=UserWithToken(user=user_mapper(user), access_token=tokens_pair.access_token).model_dump(by_alias=True),
     )
     response.set_cookie(consts.REFRESH_COOKIE, tokens_pair.refresh_token)
     return response
@@ -48,18 +43,16 @@ async def login_user(
 
 @router.post("/register", response_model=UserWithToken)
 async def register_user(
-        dto: UserCreate,
-        users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
-        tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)], ):
+    dto: UserCreate,
+    users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+    tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+):
     # TODO вынести в usecases
     user = await users_repository.add(dto)
     tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
 
     response = JSONResponse(
-        content=UserWithToken(
-            user=user_mapper(user),
-            access_token=tokens_pair.access_token
-        ).model_dump(by_alias=True),
+        content=UserWithToken(user=user_mapper(user), access_token=tokens_pair.access_token).model_dump(by_alias=True),
     )
     response.set_cookie(consts.REFRESH_COOKIE, tokens_pair.refresh_token)
     return response
@@ -67,9 +60,10 @@ async def register_user(
 
 @router.post("/refresh", response_model=str)
 async def refresh_token(
-        users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
-        tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
-        token_info: TokenInfo = Depends(extract_refresh_token)):
+    users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+    tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
+    token_info: TokenInfo = Depends(extract_refresh_token),
+):
     user = await authorize_user(
         token_info,
         users_repository=users_repository,
@@ -77,10 +71,7 @@ async def refresh_token(
     tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
 
     response = JSONResponse(
-        content=UserWithToken(
-            user=user_mapper(user),
-            access_token=tokens_pair.access_token
-        ).model_dump(by_alias=True),
+        content=UserWithToken(user=user_mapper(user), access_token=tokens_pair.access_token).model_dump(by_alias=True),
     )
     response.set_cookie(consts.REFRESH_COOKIE, tokens_pair.refresh_token)
     return response

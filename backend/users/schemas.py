@@ -15,7 +15,6 @@ class ProfileCreate(PydanticModel):
 
 
 class ProfileRead(PydanticModel):
-    id: int
     user_id: int
     org_name: str
     contact_phone: str
@@ -26,16 +25,16 @@ class ProfileRead(PydanticModel):
 
 
 class ProfileUpdate(PydanticModel):
-    org_name: Optional[str]
-    contact_phone: Optional[str]
-    ceo_fullname: Optional[str]
-    inn: Optional[str]
-    kpp: Optional[str]
-    ogrn: Optional[str]
+    org_name: Optional[str] = None
+    contact_phone: Optional[str] = None
+    ceo_fullname: Optional[str] = None
+    inn: Optional[str] = None
+    kpp: Optional[str] = None
+    ogrn: Optional[str] = None
 
 
 class ProfileDelete(PydanticModel):
-    id: int
+    user_id: int
 
 
 class UserRead(PydanticModel):

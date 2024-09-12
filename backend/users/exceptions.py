@@ -1,6 +1,6 @@
 from core.exceptions import EntityNotFound
 
-from .models import User
+from .models import User, Profile
 
 
 class UserNotFound(EntityNotFound):
@@ -10,4 +10,4 @@ class UserNotFound(EntityNotFound):
 
 class ProfileNotFound(EntityNotFound):
     def __init__(self):
-        super().__init__(User)
+        super().__init__(Profile)

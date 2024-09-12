@@ -17,13 +17,12 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
 
-    profile: Mapped[Optional["Profile"]] = relationship('Profile', uselist=False)
+    profile: Mapped[Optional["Profile"]] = relationship("Profile", uselist=False)
 
 
 class Profile(Base):
     __tablename__ = "profiles"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
     org_name: Mapped[str] = mapped_column(unique=True)
     contact_phone: Mapped[str] = mapped_column(unique=True)
     ceo_fullname: Mapped[str]
@@ -31,7 +30,4 @@ class Profile(Base):
     kpp: Mapped[str]
     ogrn: Mapped[str]
 
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="cascade"),
-        primary_key=True, unique=True
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="cascade"), primary_key=True, unique=True)

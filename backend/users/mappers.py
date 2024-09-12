@@ -18,5 +18,5 @@ user_mapper = retort.get_converter(
     recipe=[
         coercer(Profile, ProfileRead, profile_mapper_default),
         coercer(Optional[Profile], Optional[ProfileRead], profile_mapper_nullable),
-    ]
+    ],
 )

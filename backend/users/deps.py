@@ -14,14 +14,13 @@ async def get_security() -> SecurityGateway:
 
 
 async def get_users_repository(
-        session: Annotated[AsyncSession, Depends(get_session)],
-        security_gateway: Annotated[SecurityGateway, Depends(get_security)],
+    session: Annotated[AsyncSession, Depends(get_session)],
+    security_gateway: Annotated[SecurityGateway, Depends(get_security)],
 ) -> UsersRepository:
     return UsersRepository(session, security_gateway=security_gateway)
 
 
 async def get_profiles_repository(
-        session: Annotated[AsyncSession, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
 ) -> ProfilesRepository:
     return ProfilesRepository(session)
-
