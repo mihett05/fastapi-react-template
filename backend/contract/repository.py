@@ -13,7 +13,7 @@ class ContractsRepository:
         self.session = session
 
     async def get(self, contract_id: int) -> Contract:
-        if contract := await self.session.get(Contract, contract_id, options=[selectinload(Contract.chat)]):
+        if contract := await self.session.get(Contract, contract_id, options=[selectinload(Contract.chat, Contract.customer, Contract.contractor)]):
             return contract
         raise ContractNotFound()
 

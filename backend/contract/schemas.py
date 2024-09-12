@@ -1,14 +1,14 @@
 from datetime import datetime
 
 from core.pydantic import PydanticModel
-from messenger.models import Chat, Message
+from messenger.schemas import ChatRead
 
 
 class ContractCreate(PydanticModel):
     customer_id: int
     contractor_id: int
     chat_id: int
-    chat: Chat
+    chat: ChatRead
 
 
 class ContractRead(PydanticModel):
@@ -18,4 +18,4 @@ class ContractRead(PydanticModel):
     chat_id: int
     updated_at: datetime
     created_at: datetime
-    chat: Chat
+    chat: ChatRead

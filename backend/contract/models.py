@@ -17,4 +17,7 @@ class Contract(Base):
     chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"))
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now())
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+
     chat: Mapped[Chat] = relationship(uselist=False)
+    customer: Mapped[Chat] = relationship(uselist=False)
+    contractor: Mapped[Chat] = relationship(uselist=False)
