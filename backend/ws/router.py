@@ -9,7 +9,7 @@ from users.deps import get_users_repository
 from users.repository import UsersRepository
 from ws.events import handlers
 from ws.managers import ConnectionManager
-from ws.models import Request, EventType, WSUserData
+from ws.schemas import Request, EventType, WSUserData
 
 router = APIRouter()
 connect_manager = ConnectionManager()

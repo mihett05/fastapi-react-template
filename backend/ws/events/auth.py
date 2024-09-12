@@ -5,7 +5,7 @@ from users.mappers import user_mapper
 from users.repository import UsersRepository
 from ws.handlers import EventHandler, SendResponse
 from ws.managers import ConnectionManager
-from ws.models import EventType, Request, Response
+from ws.schemas import EventType, Request, Response
 
 auth_handler = EventHandler(EventType.AUTH)
 

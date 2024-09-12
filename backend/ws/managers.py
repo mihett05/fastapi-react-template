@@ -3,7 +3,7 @@ from typing import Dict
 from fastapi import WebSocket
 
 from auth.schemas import UserRead
-from ws.models import WSUserData
+from ws.schemas import WSUserData
 
 
 class ConnectionManager:

@@ -10,7 +10,7 @@ from auth.models import UserRead
 from auth.tokens import TokensGateway
 from users.repository import UsersRepository
 from ws.managers import ConnectionManager
-from ws.models import EventType, Request, Response, WSUserData
+from ws.schemas import EventType, Request, Response, WSUserData
 
 
 class SendResponse:
