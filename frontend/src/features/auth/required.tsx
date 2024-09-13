@@ -20,8 +20,10 @@ function AuthRequired({ children }: AuthRequiredProps) {
 
   useEffect(() => {
     const token = getToken();
-
-    if (!user && token !== null) {
+    console.log(user, token);
+    if (!user && !token) {
+      navigate(routes.auth());
+    } else if (!user && token) {
       (async () => {
         const response = await getUser();
         if (!response.isError && response.data) {

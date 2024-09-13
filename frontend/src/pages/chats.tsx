@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router';
+import AuthRequired from '~/features/auth/required';
 import ChatList from '~/features/chat/chat-list';
 import Layout from '~/shared/ui/layout';
 
@@ -46,14 +47,16 @@ const ChatsPage = () => {
 
   return (
     <Layout>
-      <Box display="flex">
-        <aside style={{ width: '300px' }}>
-          <ChatList chats={chats} />
-        </aside>
-        <main style={{ flex: 1 }}>
-          <Outlet />
-        </main>
-      </Box>
+      <AuthRequired>
+        <Box display="flex">
+          <aside style={{ width: '300px' }}>
+            <ChatList chats={chats} />
+          </aside>
+          <main style={{ flex: 1 }}>
+            <Outlet />
+          </main>
+        </Box>
+      </AuthRequired>
     </Layout>
   );
 };
