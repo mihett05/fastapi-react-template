@@ -13,7 +13,7 @@ const tokenBaseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryErr
   extraOptions,
 ) => {
   const fetchQuery = fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE,
+    baseUrl: import.meta.env.VITE_BASE_API_URL,
     credentials: 'include',
     prepareHeaders: (headers) => {
       if (headers.has('Authorization')) {
