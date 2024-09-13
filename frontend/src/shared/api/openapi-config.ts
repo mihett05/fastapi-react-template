@@ -14,7 +14,11 @@ const config: ConfigFile = {
   apiImport: 'baseApi',
   outputFile: './api.ts',
   exportName: 'api',
-  hooks: true,
+  hooks: {
+    lazyQueries: true,
+    mutations: true,
+    queries: true,
+  },
 };
 
 export default config;
