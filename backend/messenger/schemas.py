@@ -19,7 +19,6 @@ class MessageRead(PydanticModel):
 
 class ChatRead(PydanticModel):
     id: int
-    contract_id: int
     messages: list[MessageRead]
 
 

@@ -1,7 +1,7 @@
 """Added users
 
 Revision ID: 5383aa742dc6
-Revises: 
+Revises:
 Create Date: 2024-09-08 20:10:54.101711
 
 """
