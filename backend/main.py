@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
+from sqlalchemy.exc import IntegrityError
 
 from api import api
 from auth.exceptions import InvalidCredentials
@@ -11,15 +12,22 @@ from core.exceptions import EntityNotFound
 def custom_generate_unique_id(route: APIRoute):
     if route.include_in_schema:
         return f"{route.tags[0]}-{route.name}"
-    else:
-        return route.name
+    return route.name
 
 
 app = FastAPI(docs_url="/docs", generate_unique_id_function=custom_generate_unique_id)
 
 
+@app.exception_handler(IntegrityError)
+async def entity_not_found_exception_handler(_: Request, exc: EntityNotFound):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"message": exc.args[0] if exc.args else "Invalid data was provide"},
+    )
+
+
 @app.exception_handler(EntityNotFound)
-async def entity_not_found_exception_handler(request: Request, exc: EntityNotFound):
+async def entity_not_found_exception_handler(_: Request, exc: EntityNotFound):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"message": exc.args[0] if exc.args else "Entity not found"},
@@ -27,11 +35,9 @@ async def entity_not_found_exception_handler(request: Request, exc: EntityNotFou
 
 
 @app.exception_handler(InvalidCredentials)
-async def invalid_credentials_exception_handler(
-    request: Request, exc: InvalidCredentials
-):
+async def invalid_credentials_exception_handler(_: Request, exc: InvalidCredentials):
     return JSONResponse(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=status.HTTP_400_BAD_REQUEST,
         content={
             "message": exc.args[0] if exc.args else "Invalid credentials were provided"
         },

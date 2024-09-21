@@ -4,6 +4,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.sqlalchemy import Base
+from messenger.models import Association, Chat
 
 
 class User(Base):
@@ -17,6 +18,11 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(default=True)
     is_superuser: Mapped[bool] = mapped_column(default=False)
 
+    chats_associations: Mapped[list[Association]] = relationship()
+    chats: Mapped[list[Chat]] = relationship(
+        secondary=Association.__tablename__,
+        viewonly=True
+    )
     profile: Mapped[Optional["Profile"]] = relationship("Profile", uselist=False)
 
 

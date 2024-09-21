@@ -4,6 +4,7 @@ from auth.schemas import UserAuthenticate
 from auth.tokens.dtos import TokenInfo
 from users.exceptions import UserNotFound
 from users.repository import UsersRepository
+from users.schemas import UserCreate
 from users.security import SecurityGateway
 from users.security.dtos import PasswordDto
 
@@ -36,3 +37,11 @@ async def authorize_user(
         return await users_repository.get_by_email(dto.subject)
     except UserNotFound:
         raise InvalidCredentials()
+
+
+async def create_user(
+    dto: UserCreate,
+    *,
+    users_repository: UsersRepository,
+) -> User:
+    return await users_repository.add(dto)

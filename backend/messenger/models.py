@@ -6,13 +6,25 @@ from core.sqlalchemy import Base
 from datetime import datetime
 
 
+class Association(Base):
+    __tablename__ = "chat_to_user"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"), primary_key=True)
+
+
 class Chat(Base):
     __tablename__ = "chats"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    messages: Mapped[list["Message"]] = relationship(
-        "Message", cascade="all, delete-orphan"
+    name: Mapped[str] = mapped_column(nullable=False)
+
+    members_associations: Mapped[list[Association]] = relationship()
+    members: Mapped[list["User"]] = relationship(
+        secondary=Association.__tablename__,
+        viewonly=True
     )
+
+    messages: Mapped[list["Message"]] = relationship(cascade="all, delete-orphan")
 
 
 class Message(Base):
