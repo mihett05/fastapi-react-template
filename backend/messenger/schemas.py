@@ -16,6 +16,11 @@ class MessageRead(PydanticModel):
     message_text: str
 
 
+class ChatCreate(PydanticModel):
+    name: str
+    members: list[int]
+
+
 class ChatRead(PydanticModel):
     id: int
     name: str
@@ -24,6 +29,9 @@ class ChatRead(PydanticModel):
     messages: list[MessageRead]
 
 
-class ChatCreate(PydanticModel):
-    name: str
-    members: list[int]
+class ChatUpdate(PydanticModel):
+    pass
+
+
+class ChatDelete(PydanticModel):
+    pass

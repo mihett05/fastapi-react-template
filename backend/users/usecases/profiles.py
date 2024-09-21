@@ -3,23 +3,21 @@ from users.repository import ProfilesRepository
 from users.schemas import ProfileCreate, ProfileUpdate
 
 
-async def get_profile_usc(user: User) -> Profile:
+async def get_profile_uc(user: User) -> Profile:
     return await ProfilesRepository.get_by_user(user)
 
 
-async def create_profile_usc(
-    dto: ProfileCreate, user: User, *, profile_repository: ProfilesRepository
+async def create_profile_uc(
+    dto: ProfileCreate, user: User, *, repo: ProfilesRepository
 ) -> Profile:
-    return await profile_repository.add(dto, user)
+    return await repo.add(dto, user)
 
 
-async def update_profile_usc(
-    dto: ProfileUpdate, user: User, *, profile_repository: ProfilesRepository
+async def update_profile_uc(
+    dto: ProfileUpdate, user: User, *, repo: ProfilesRepository
 ) -> Profile:
-    return await profile_repository.update(dto, user)
+    return await repo.update(dto, user)
 
 
-async def delete_profile_usc(
-    user: User, *, profile_repository: ProfilesRepository
-) -> Profile:
-    return await profile_repository.delete(user)
+async def delete_profile_uc(user: User, *, repo: ProfilesRepository) -> Profile:
+    return await repo.delete(user)

@@ -8,8 +8,8 @@ from auth.deps import get_tokens, extract_refresh_token
 from auth.schemas import UserWithToken, UserAuthenticate
 from auth.tokens import TokensGateway
 from auth.tokens.dtos import TokenInfo, TokenPairDto
-from auth.usecases import authenticate_user, authorize_user, create_token_pair
-from auth.usecases.authenticate import create_user
+from auth.usecases import authenticate_user_uc, authorize_user_uc, create_token_pair_uc
+from auth.usecases.authenticate import create_user_uc
 from users.deps import get_security, get_users_repository
 from users.mappers import user_mapper
 from users.models import User
@@ -37,12 +37,12 @@ async def login_user(
     security_gateway: Annotated[SecurityGateway, Depends(get_security)],
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ):
-    user = await authenticate_user(
+    user = await authenticate_user_uc(
         dto,
-        users_repository=users_repository,
-        security_gateway=security_gateway,
+        repo=users_repository,
+        gateway=security_gateway,
     )
-    tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
+    tokens_pair = await create_token_pair_uc(user, gateway=tokens_gateway)
 
     return get_auth_response(user, tokens_pair)
 
@@ -53,8 +53,8 @@ async def register_user(
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ):
-    user = await create_user(dto, users_repository=users_repository)
-    tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
+    user = await create_user_uc(dto, repo=users_repository)
+    tokens_pair = await create_token_pair_uc(user, gateway=tokens_gateway)
 
     return get_auth_response(user, tokens_pair)
 
@@ -65,7 +65,7 @@ async def refresh_token(
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
     token_info: Annotated[TokenInfo, Depends(extract_refresh_token)],
 ):
-    user = await authorize_user(token_info, users_repository=users_repository)
-    tokens_pair = await create_token_pair(user, tokens_gateway=tokens_gateway)
+    user = await authorize_user_uc(token_info, repo=users_repository)
+    tokens_pair = await create_token_pair_uc(user, gateway=tokens_gateway)
 
     return get_auth_response(user, tokens_pair)

@@ -10,10 +10,10 @@ from users.models import User
 from users.repository import ProfilesRepository
 from users.schemas import ProfileRead, ProfileCreate, ProfileUpdate
 from users.usecases.profiles import (
-    create_profile_usc,
-    update_profile_usc,
-    delete_profile_usc,
-    get_profile_usc,
+    create_profile_uc,
+    update_profile_uc,
+    delete_profile_uc,
+    get_profile_uc,
 )
 
 router = APIRouter()
@@ -30,7 +30,7 @@ async def get_user(
 async def get_profile(
     user: Annotated[User, Depends(get_current_user)],
 ):
-    profile = await get_profile_usc(user)
+    profile = await get_profile_uc(user)
     return profile_mapper(profile)
 
 
@@ -40,7 +40,7 @@ async def create_profile(
     user: Annotated[User, Depends(get_current_user)],
     profile_repository: Annotated[ProfilesRepository, Depends(get_profiles_repository)],
 ):
-    profile = await create_profile_usc(dto, user, profile_repository=profile_repository)
+    profile = await create_profile_uc(dto, user, repo=profile_repository)
     return profile_mapper(profile)
 
 
@@ -50,7 +50,7 @@ async def update_profile(
     user: Annotated[User, Depends(get_current_user)],
     profile_repository: Annotated[ProfilesRepository, Depends(get_profiles_repository)],
 ):
-    profile = await update_profile_usc(dto, user, profile_repository=profile_repository)
+    profile = await update_profile_uc(dto, user, repo=profile_repository)
     return profile_mapper(profile)
 
 
@@ -59,5 +59,5 @@ async def delete_profile(
     user: Annotated[User, Depends(get_current_user)],
     profile_repository: Annotated[ProfilesRepository, Depends(get_profiles_repository)],
 ):
-    profile = await delete_profile_usc(user, profile_repository=profile_repository)
+    profile = await delete_profile_uc(user, repo=profile_repository)
     return profile_mapper(profile)

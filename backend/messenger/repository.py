@@ -1,14 +1,11 @@
-from sqlalchemy import select, or_
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from messenger.models import Message, Chat
 from messenger.schemas import MessageCreate, ChatCreate
+from users.models import User
 from .exceptions import MessageNotFound, ChatNotFound
-
-import time
-
-from datetime import datetime
 
 
 class MessagesRepository:
@@ -29,12 +26,7 @@ class MessagesRepository:
 
     async def get_by_user(self, user_id: int) -> list[Message]:
         if messages := await self.session.scalars(
-            select(Message).where(
-                or_(
-                    Message.receiver_id == user_id,  # type: ignore
-                    Message.sender_id == user_id,
-                )
-            )
+            select(Message).where(Message.receiver_id == user_id)  # type: ignore
         ):
             return messages  # type: ignore
         raise MessageNotFound()
@@ -60,9 +52,19 @@ class ChatsRepository:
 
     async def get(self, chat_id: int) -> Chat:
         if chat := await self.session.get(
-            Chat, chat_id, options=[selectinload(Chat.messages), selectinload()]
+            Chat,
+            chat_id,
+            options=[selectinload(Chat.members), selectinload(Chat.messages)],
         ):
             return chat  # type: ignore
+        raise ChatNotFound()
+
+    async def get_list(self, user: User) -> list[Chat]:
+        if chats := await self.session.scalars(
+            select(Chat).where(Chat.members.contains(user))
+        ):
+            return chats  # type: ignore
+
         raise ChatNotFound()
 
     async def add(self, dto: ChatCreate) -> Chat:
