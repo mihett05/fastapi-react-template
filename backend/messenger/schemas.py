@@ -1,12 +1,10 @@
 from core.pydantic import PydanticModel
-from messenger.models import Chat, Message
 from users.schemas import UserRead
 
 
 class MessageCreate(PydanticModel):
     chat_id: int
-    user_to_id: int
-    user_from_id: int
+    sender_id: int
     message_text: str
 
 

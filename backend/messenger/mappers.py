@@ -15,14 +15,16 @@ retort = sqlalchemy_retort.extend(recipe=[])
 message_mapper = retort.get_converter(Message, MessageRead)
 
 chat_mapper = retort.get_converter(
-    Chat, ChatRead,
+    Chat,
+    ChatRead,
     recipe=[
         coercer(User, UserRead, user_mapper),
         coercer(Message, MessageRead, message_mapper),
-    ]
+    ],
 )
 chat_mapper_nullable = retort.get_converter(
-    Optional[Chat], Optional[ChatRead],
+    Optional[Chat],
+    Optional[ChatRead],
     recipe=[
         coercer(User, UserRead, user_mapper),
         coercer(Message, MessageRead, message_mapper),

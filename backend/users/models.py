@@ -20,8 +20,7 @@ class User(Base):
 
     chats_associations: Mapped[list[Association]] = relationship()
     chats: Mapped[list[Chat]] = relationship(
-        secondary=Association.__tablename__,
-        viewonly=True
+        secondary=Association.__tablename__, viewonly=True
     )
     profile: Mapped[Optional["Profile"]] = relationship("Profile", uselist=False)
 
