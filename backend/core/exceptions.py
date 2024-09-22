@@ -7,5 +7,5 @@ class PermissionDenied(Exception):
     def __init__(self, cls: type) -> None:
         super().__init__(
             f"The current user does not have enough rights "
-            f"to work with the requested object. Requested {cls.__name__}"
+            f'to work with the requested object. Requested: "{cls.__name__}"'
         )

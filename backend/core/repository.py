@@ -13,11 +13,12 @@ class BaseRepository:
     async def update_model_attrs(model: Base, dto: PydanticModel) -> Base:
         attrs = dto.model_dump().keys()
         for attr in attrs:
-            new = getattr(dto, attr)
-            old = getattr(model, attr)
+            new = getattr(dto, attr, None)
+            old = getattr(model, attr, None)
 
             if type(new) not in BaseRepository.default_updated_types:
                 continue
+
             setattr(model, attr, new or old)
 
         return model

@@ -16,3 +16,8 @@ class ChatNotFound(EntityNotFound):
 class ChatPermissionDenied(PermissionDenied):
     def __init__(self):
         super().__init__(Chat)
+
+
+class MessagePermissionDenied(PermissionDenied):
+    def __init__(self):
+        super().__init__(Message)

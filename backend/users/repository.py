@@ -63,7 +63,7 @@ class UsersRepository:
         return model
 
     async def update(self, user: User):
-        self.session.add(user)
+        await self.session.refresh(user)
         await self.session.commit()
 
     async def delete(self, user: User):
@@ -105,6 +105,8 @@ class ProfilesRepository(BaseRepository):
         if user.profile is None:
             raise ProfileNotFound()
         model = await self.update_model_attrs(user.profile, dto)
+
+        await self.session.refresh(model)
         await self.session.commit()
 
         return model  # type: ignore

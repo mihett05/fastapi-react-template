@@ -22,7 +22,7 @@ from users.usecases import get_users
 router = APIRouter()
 
 
-@router.get("/chat", response_model=list[ChatRead])
+@router.get("", response_model=list[ChatRead])
 async def get_chats_handler(
     user: Annotated[User, Depends(get_current_user)],
     chats_repository: Annotated[ChatsRepository, Depends(get_chats_repository)],
@@ -30,19 +30,18 @@ async def get_chats_handler(
     return await get_chats(user, repository=chats_repository)
 
 
-@router.post("/chat", response_model=ChatRead)
+@router.post("", response_model=ChatRead)
 async def create_chat_handler(
     dto: ChatCreate,
     user: Annotated[User, Depends(get_current_user)],  # noqa
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
     chats_repository: Annotated[ChatsRepository, Depends(get_chats_repository)],
 ):
-    return await create_chat(
-        dto, repository=chats_repository, users_repository=users_repository
-    )
+    users = await get_users(dto.members, repository=users_repository)
+    return await create_chat(dto, users, repository=chats_repository)
 
 
-@router.get("/chat/{chat_id}", response_model=ChatRead)
+@router.get("/{chat_id}", response_model=ChatRead)
 async def get_chat_handler(
     chat_id: int,
     user: Annotated[User, Depends(get_current_user)],
@@ -51,8 +50,8 @@ async def get_chat_handler(
     return await get_chat(chat_id, user, repository=chats_repository)
 
 
-@router.patch("/chat/{chat_id}/attrs", response_model=ChatRead)
-async def update_chat_handler(
+@router.patch("/{chat_id}/attrs", response_model=ChatRead)
+async def update_chat_attrs_handler(
     chat_id: int,
     dto: ChatUpdate,
     user: Annotated[User, Depends(get_current_user)],
@@ -62,8 +61,8 @@ async def update_chat_handler(
     return await update_chat_attrs(chat, dto, repository=chats_repository)
 
 
-@router.patch("/chat/{chat_id}/members", response_model=ChatRead)
-async def update_chat_handler(
+@router.patch("/{chat_id}/members", response_model=ChatRead)
+async def update_chat_members_handler(
     chat_id: int,
     dto: ChatUpdate,
     user: Annotated[User, Depends(get_current_user)],
@@ -71,15 +70,20 @@ async def update_chat_handler(
     chats_repository: Annotated[ChatsRepository, Depends(get_chats_repository)],
 ):
     chat = await get_chat(chat_id, user, repository=chats_repository)
-    include = await get_users(dto.include, repository=users_repository)
-    exclude = await get_users(dto.exclude, repository=users_repository)
+
+    include = (
+        await get_users(dto.include, repository=users_repository) if dto.include else []
+    )
+    exclude = (
+        await get_users(dto.exclude, repository=users_repository) if dto.exclude else []
+    )
 
     return await update_chat_members(
         chat, include, exclude, repository=chats_repository
     )
 
 
-@router.delete("/chat/{chat_id}", response_model=ChatRead)
+@router.delete("/{chat_id}", response_model=ChatRead)
 async def delete_chat_handler(
     chat_id: int,
     user: Annotated[User, Depends(get_current_user)],

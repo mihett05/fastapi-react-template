@@ -7,7 +7,6 @@ from users.schemas import UserRead
 
 class MessageCreate(PydanticModel):
     chat_id: int
-    sender_id: int
     message_text: str
 
 
@@ -15,7 +14,11 @@ class MessageRead(PydanticModel):
     id: int
     chat_id: int
     sender_id: int
-    created_at: datetime
+    modified_at: datetime
+    message_text: str
+
+
+class MessageUpdate(PydanticModel):
     message_text: str
 
 

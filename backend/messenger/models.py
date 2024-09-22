@@ -1,7 +1,7 @@
 from typing import Set
 
 from sqlalchemy import ForeignKey, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
 from core.sqlalchemy import Base
 
@@ -23,7 +23,9 @@ class Message(Base):
     chat_id: Mapped[int] = mapped_column(ForeignKey("chats.id"))
     message_text: Mapped[str]
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    modified_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), server_onupdate=func.current_timestamp()
+    )
 
 
 class Chat(Base):
