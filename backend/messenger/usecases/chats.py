@@ -31,20 +31,36 @@ async def create_chat(
 
 
 async def update_chat(
-    chat_id: int,
-    dto: ChatUpdate,
-    user: User,
+    chat: Chat,
+    users: list[User],
     *,
     repository: ChatsRepository,
-    users_repository: UsersRepository
 ) -> Chat:
-    chat = await get_chat(chat_id, user, repository=repository)
-    users = await get_users(dto.members, repository=users_repository)
-    model = await repository.update_model_attrs(chat, dto)
+    return await repository.update_members(chat, users)
 
-    model.members.update(users)  # type: ignore
 
-    return await repository.update(model)  # type: ignore
+async def update_chat_attrs(
+    chat: Chat,
+    dto: ChatUpdate,
+    *,
+    repository: ChatsRepository,
+) -> Chat:
+    return await repository.update_attrs(chat, dto)
+
+
+async def update_chat_members(
+    chat: Chat,
+    include: list[User],
+    exclude: list[User],
+    *,
+    repository: ChatsRepository,
+) -> Chat:
+    users = chat.members
+    users.update(include)
+    for user in exclude:
+        users.discard(user)
+
+    return await repository.update_members(chat, users)
 
 
 async def delete_chat(chat_id: int, user: User, *, repository: ChatsRepository) -> Chat:

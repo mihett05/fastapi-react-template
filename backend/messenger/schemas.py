@@ -34,4 +34,5 @@ class ChatRead(PydanticModel):
 
 class ChatUpdate(PydanticModel):
     name: Optional[str] = None
-    members: Optional[list[int]] = []
+    include: Optional[list[int]] = []
+    exclude: Optional[list[int]] = []

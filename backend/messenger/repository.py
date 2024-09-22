@@ -87,7 +87,18 @@ class ChatsRepository(BaseRepository):
 
         return model
 
-    async def update(self, model: Chat) -> Chat:
+    async def update_attrs(self, model: Chat, dto: ChatUpdate) -> Chat:
+        model = await self.update_model_attrs(model, dto)
+
+        self.session.add(model)
+        await self.session.commit()
+
+        return model  # type: ignore
+
+    async def update_members(self, model: Chat, members: set[User]) -> Chat:
+        model.members.clear()
+        model.members.update(members)
+
         self.session.add(model)
         await self.session.commit()
 

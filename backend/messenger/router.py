@@ -10,12 +10,14 @@ from messenger.usecases import (
     get_chat,
     create_chat,
     get_chats,
-    update_chat,
+    update_chat_attrs,
+    update_chat_members,
     delete_chat,
 )
 from users.deps import get_users_repository
 from users.models import User
 from users.repository import UsersRepository
+from users.usecases import get_users
 
 router = APIRouter()
 
@@ -49,7 +51,18 @@ async def get_chat_handler(
     return await get_chat(chat_id, user, repository=chats_repository)
 
 
-@router.patch("/chat/{chat_id}", response_model=ChatRead)
+@router.patch("/chat/{chat_id}/attrs", response_model=ChatRead)
+async def update_chat_handler(
+    chat_id: int,
+    dto: ChatUpdate,
+    user: Annotated[User, Depends(get_current_user)],
+    chats_repository: Annotated[ChatsRepository, Depends(get_chats_repository)],
+):
+    chat = await get_chat(chat_id, user, repository=chats_repository)
+    return await update_chat_attrs(chat, dto, repository=chats_repository)
+
+
+@router.patch("/chat/{chat_id}/members", response_model=ChatRead)
 async def update_chat_handler(
     chat_id: int,
     dto: ChatUpdate,
@@ -57,12 +70,12 @@ async def update_chat_handler(
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
     chats_repository: Annotated[ChatsRepository, Depends(get_chats_repository)],
 ):
-    return await update_chat(
-        chat_id,
-        dto,
-        user,
-        repository=chats_repository,
-        users_repository=users_repository,
+    chat = await get_chat(chat_id, user, repository=chats_repository)
+    include = await get_users(dto.include, repository=users_repository)
+    exclude = await get_users(dto.exclude, repository=users_repository)
+
+    return await update_chat_members(
+        chat, include, exclude, repository=chats_repository
     )
 
 
