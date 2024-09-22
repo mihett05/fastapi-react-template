@@ -30,15 +30,6 @@ async def create_chat(
     return await repository.add(chat)
 
 
-async def update_chat(
-    chat: Chat,
-    users: list[User],
-    *,
-    repository: ChatsRepository,
-) -> Chat:
-    return await repository.update_members(chat, users)
-
-
 async def update_chat_attrs(
     chat: Chat,
     dto: ChatUpdate,
