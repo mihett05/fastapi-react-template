@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from core.repository import BaseRepository
 from users.models import User, Profile
 from users.schemas import UserCreate, ProfileCreate, ProfileUpdate
 from .exceptions import UserNotFound, ProfileNotFound
@@ -21,12 +22,30 @@ class UsersRepository:
         raise UserNotFound()
 
     async def get_by_email(self, email: str) -> User:
-        query = (
-            select(User).where(User.email == email).options(selectinload(User.profile))
-        )
-
-        if user := await self.session.scalar(query):
+        if user := await self.session.scalar(
+            select(User)
+            .where(User.email == email)  # type: ignore
+            .options(selectinload(User.profile))
+        ):
             return user
+        raise UserNotFound()
+
+    async def get_all(self) -> list[User]:
+        if users := (
+            await self.session.scalars(select(User).options(selectinload(User.profile)))
+        ).all():
+            return users  # type: ignore
+        raise UserNotFound()
+
+    async def get_list(self, user_ids: list[int]) -> list[User]:
+        if users := (
+            await self.session.scalars(
+                select(User)
+                .where(User.id.in_(user_ids))
+                .options(selectinload(User.profile))
+            )
+        ).all():
+            return users  # type: ignore
         raise UserNotFound()
 
     async def add(self, user_create: UserCreate) -> User:
@@ -52,7 +71,7 @@ class UsersRepository:
         await self.session.commit()
 
 
-class ProfilesRepository:
+class ProfilesRepository(BaseRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -64,7 +83,7 @@ class ProfilesRepository:
 
     async def get(self, profile_id: int) -> Profile:
         if profile := await self.session.get(Profile, profile_id):
-            return profile
+            return profile  # type: ignore
         raise ProfileNotFound()
 
     async def add(self, dto: ProfileCreate, user: User) -> Profile:
@@ -82,15 +101,13 @@ class ProfilesRepository:
         await self.session.commit()
         return model
 
-    async def update(self, dto: ProfileUpdate, user: User) -> Profile:
-        model = user.profile
-
-        attrs = dto.model_dump().keys()
-        for attr in attrs:
-            setattr(model, attr, getattr(dto, attr) or getattr(model, attr))
-
+    async def update(self, user: User, dto: ProfileUpdate) -> Profile:
+        if user.profile is None:
+            raise ProfileNotFound()
+        model = await self.update_model_attrs(user.profile, dto)
         await self.session.commit()
-        return model
+
+        return model  # type: ignore
 
     async def delete(self, user: User):
         profile = user.profile

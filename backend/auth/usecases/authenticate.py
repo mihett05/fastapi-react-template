@@ -10,14 +10,11 @@ from users.security.dtos import PasswordDto
 
 
 async def authenticate_user(
-    dto: UserAuthenticate,
-    *,
-    users_repository: UsersRepository,
-    security_gateway: SecurityGateway,
+    dto: UserAuthenticate, *, repository: UsersRepository, gateway: SecurityGateway
 ) -> User:
     try:
-        user = await users_repository.get_by_email(dto.email)
-        is_password_valid = security_gateway.verify_passwords(
+        user = await repository.get_by_email(dto.email)
+        is_password_valid = gateway.verify_passwords(
             dto.password,
             PasswordDto(hashed_password=user.hashed_password, salt=user.salt),
         )
@@ -28,20 +25,12 @@ async def authenticate_user(
         raise InvalidCredentials()
 
 
-async def authorize_user(
-    dto: TokenInfo,
-    *,
-    users_repository: UsersRepository,
-) -> User:
+async def authorize_user(dto: TokenInfo, *, repository: UsersRepository) -> User:
     try:
-        return await users_repository.get_by_email(dto.subject)
+        return await repository.get_by_email(dto.subject)
     except UserNotFound:
         raise InvalidCredentials()
 
 
-async def create_user(
-    dto: UserCreate,
-    *,
-    users_repository: UsersRepository,
-) -> User:
-    return await users_repository.add(dto)
+async def create_user(dto: UserCreate, *, repository: UsersRepository) -> User:
+    return await repository.add(dto)
