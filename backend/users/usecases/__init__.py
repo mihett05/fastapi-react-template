@@ -1,3 +1,11 @@
-from .profiles import create_profile_uc, update_profile_uc, delete_profile_uc
+from .users import get_users, get_all_users
+from .profiles import get_profile, create_profile, update_profile, delete_profile
 
-__all__ = ["create_profile_uc", "update_profile_uc", "delete_profile_uc"]
+__all__ = [
+    "get_profile",
+    "create_profile",
+    "update_profile",
+    "delete_profile",
+    "get_users",
+    "get_all_users",
+]

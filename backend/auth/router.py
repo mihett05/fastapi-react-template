@@ -8,8 +8,13 @@ from auth.deps import get_tokens, extract_refresh_token
 from auth.schemas import UserWithToken, UserAuthenticate
 from auth.tokens import TokensGateway
 from auth.tokens.dtos import TokenInfo, TokenPairDto
-from auth.usecases import authenticate_user_uc, authorize_user_uc, create_token_pair_uc
-from auth.usecases.authenticate import create_user_uc
+from auth.usecases import (
+    authenticate_user,
+    authorize_user,
+    create_token_pair,
+    create_user,
+)
+
 from users.deps import get_security, get_users_repository
 from users.mappers import user_mapper
 from users.models import User
@@ -31,41 +36,41 @@ def get_auth_response(user: User, tokens: TokenPairDto) -> JSONResponse:
 
 
 @router.post("/login", response_model=UserWithToken)
-async def login_user(
+async def login_user_handler(
     dto: UserAuthenticate,
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
     security_gateway: Annotated[SecurityGateway, Depends(get_security)],
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ):
-    user = await authenticate_user_uc(
+    user = await authenticate_user(
         dto,
-        repo=users_repository,
+        repository=users_repository,
         gateway=security_gateway,
     )
-    tokens_pair = await create_token_pair_uc(user, gateway=tokens_gateway)
+    tokens_pair = await create_token_pair(user, gateway=tokens_gateway)
 
     return get_auth_response(user, tokens_pair)
 
 
 @router.post("/register", response_model=UserWithToken)
-async def register_user(
+async def register_user_handler(
     dto: UserCreate,
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
 ):
-    user = await create_user_uc(dto, repo=users_repository)
-    tokens_pair = await create_token_pair_uc(user, gateway=tokens_gateway)
+    user = await create_user(dto, repository=users_repository)
+    tokens_pair = await create_token_pair(user, gateway=tokens_gateway)
 
     return get_auth_response(user, tokens_pair)
 
 
 @router.post("/refresh", response_model=UserWithToken)
-async def refresh_token(
+async def refresh_token_handler(
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
     token_info: Annotated[TokenInfo, Depends(extract_refresh_token)],
 ):
-    user = await authorize_user_uc(token_info, repo=users_repository)
-    tokens_pair = await create_token_pair_uc(user, gateway=tokens_gateway)
+    user = await authorize_user(token_info, repository=users_repository)
+    tokens_pair = await create_token_pair(user, gateway=tokens_gateway)
 
     return get_auth_response(user, tokens_pair)

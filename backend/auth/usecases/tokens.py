@@ -3,5 +3,5 @@ from auth.tokens.dtos import TokenPairDto
 from auth.tokens.gateway import TokensGateway
 
 
-async def create_token_pair_uc(user: User, *, gateway: TokensGateway) -> TokenPairDto:
+async def create_token_pair(user: User, *, gateway: TokensGateway) -> TokenPairDto:
     return await gateway.create_token_pair(user.email)

@@ -17,7 +17,7 @@ from users.deps import get_users_repository
 from users.models import User
 from users.repository import UsersRepository
 from auth.tokens.jwt import JwtTokensGateway, TokenConfig
-from auth.usecases import authorize_user_uc
+from auth.usecases import authorize_user
 
 cookie_scheme = APIKeyCookie(name=consts.REFRESH_COOKIE)
 oauth2_scheme = OAuth2PasswordBearer("/auth/token")
@@ -46,4 +46,4 @@ async def get_current_user(
     token: Annotated[TokenInfo, Depends(extract_access_token)],
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
 ) -> User:
-    return await authorize_user_uc(token, repo=users_repository)
+    return await authorize_user(token, repository=users_repository)

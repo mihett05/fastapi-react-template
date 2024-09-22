@@ -9,11 +9,11 @@ from users.security import SecurityGateway
 from users.security.dtos import PasswordDto
 
 
-async def authenticate_user_uc(
-    dto: UserAuthenticate, *, repo: UsersRepository, gateway: SecurityGateway
+async def authenticate_user(
+    dto: UserAuthenticate, *, repository: UsersRepository, gateway: SecurityGateway
 ) -> User:
     try:
-        user = await repo.get_by_email(dto.email)
+        user = await repository.get_by_email(dto.email)
         is_password_valid = gateway.verify_passwords(
             dto.password,
             PasswordDto(hashed_password=user.hashed_password, salt=user.salt),
@@ -25,12 +25,12 @@ async def authenticate_user_uc(
         raise InvalidCredentials()
 
 
-async def authorize_user_uc(dto: TokenInfo, *, repo: UsersRepository) -> User:
+async def authorize_user(dto: TokenInfo, *, repository: UsersRepository) -> User:
     try:
-        return await repo.get_by_email(dto.subject)
+        return await repository.get_by_email(dto.subject)
     except UserNotFound:
         raise InvalidCredentials()
 
 
-async def create_user_uc(dto: UserCreate, *, repo: UsersRepository) -> User:
-    return await repo.add(dto)
+async def create_user(dto: UserCreate, *, repository: UsersRepository) -> User:
+    return await repository.add(dto)

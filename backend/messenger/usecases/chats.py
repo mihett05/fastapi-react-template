@@ -6,51 +6,51 @@ from messenger.repository import ChatsRepository
 from messenger.schemas import ChatCreate, ChatUpdate
 from users.models import User
 from users.repository import UsersRepository
-from users.usecases.users import get_users_uc
+from users.usecases.users import get_users
 
 
-async def get_chat_uc(chat_id: int, user: User, *, repo: ChatsRepository) -> Chat:
-    chat = await repo.get(chat_id)
+async def get_chat(chat_id: int, user: User, *, repository: ChatsRepository) -> Chat:
+    chat = await repository.get(chat_id)
     if user not in chat.members:
         raise ChatPermissionDenied()
 
     return chat
 
 
-async def get_chats_uc(user: User, *, repo: ChatsRepository) -> Iterable[Chat]:
-    return await repo.get_list(user)
+async def get_chats(user: User, *, repository: ChatsRepository) -> Iterable[Chat]:
+    return await repository.get_list(user)
 
 
-async def create_chat_uc(
-    dto: ChatCreate, *, repo: ChatsRepository, users_repo: UsersRepository
+async def create_chat(
+    dto: ChatCreate, *, repository: ChatsRepository, users_repository: UsersRepository
 ) -> Chat:
-    users = await get_users_uc(dto.members, repo=users_repo)
+    users = await get_users(dto.members, repository=users_repository)
     chat = Chat(name=dto.name, messages=[], members=users)  # type: ignore
 
-    return await repo.add(chat)
+    return await repository.add(chat)
 
 
-async def update_chat_uc(
+async def update_chat(
     chat_id: int,
     dto: ChatUpdate,
     user: User,
     *,
-    repo: ChatsRepository,
-    users_repo: UsersRepository
+    repository: ChatsRepository,
+    users_repository: UsersRepository
 ) -> Chat:
-    chat = await get_chat_uc(chat_id, user, repo=repo)
-    users = await get_users_uc(dto.members, repo=users_repo)
-    model = await repo.update_model_attrs(chat, dto)
+    chat = await get_chat(chat_id, user, repository=repository)
+    users = await get_users(dto.members, repository=users_repository)
+    model = await repository.update_model_attrs(chat, dto)
 
     model.members.update(users)  # type: ignore
 
-    return await repo.update(model)  # type: ignore
+    return await repository.update(model)  # type: ignore
 
 
-async def delete_chat_uc(chat_id: int, user: User, *, repo: ChatsRepository) -> Chat:
+async def delete_chat(chat_id: int, user: User, *, repository: ChatsRepository) -> Chat:
     # TODO надо подумать, что делать с чатами,
     #  т.к. пользователей много и какой-то один не вправе удалять группу
     #  добавить права (?)
-    chat = await get_chat_uc(chat_id, user, repo=repo)
-    await repo.delete(chat)
+    chat = await get_chat(chat_id, user, repository=repository)
+    await repository.delete(chat)
     return chat
