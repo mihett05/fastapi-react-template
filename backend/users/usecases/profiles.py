@@ -1,5 +1,5 @@
 from users.models import Profile, User
-from users.repository import ProfilesRepository
+from users.repository import ProfilesRepository, UsersRepository
 from users.schemas import ProfileCreate, ProfileUpdate
 
 
@@ -16,7 +16,7 @@ async def create_profile_uc(
 async def update_profile_uc(
     dto: ProfileUpdate, user: User, *, repo: ProfilesRepository
 ) -> Profile:
-    return await repo.update(dto, user)
+    return await repo.update(user, dto)
 
 
 async def delete_profile_uc(user: User, *, repo: ProfilesRepository) -> Profile:

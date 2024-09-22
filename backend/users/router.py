@@ -4,10 +4,9 @@ from fastapi import APIRouter, Depends
 
 from auth.deps import get_current_user
 from auth.schemas import UserRead
-from users.deps import get_profiles_repository
-from users.mappers import user_mapper, profile_mapper_default as profile_mapper
+from users.deps import get_profiles_repository, get_users_repository
 from users.models import User
-from users.repository import ProfilesRepository
+from users.repository import ProfilesRepository, UsersRepository
 from users.schemas import ProfileRead, ProfileCreate, ProfileUpdate
 from users.usecases.profiles import (
     create_profile_uc,
@@ -15,23 +14,31 @@ from users.usecases.profiles import (
     delete_profile_uc,
     get_profile_uc,
 )
+from users.usecases.users import get_all_users_uc
 
 router = APIRouter()
+
+
+@router.get("/", response_model=list[UserRead])
+async def get_user(
+    user: Annotated[User, Depends(get_current_user)],  # noqa
+    users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
+):
+    return await get_all_users_uc(repo=users_repository)
 
 
 @router.get("/me", response_model=UserRead)
 async def get_user(
     user: Annotated[User, Depends(get_current_user)],
 ):
-    return user_mapper(user)
+    return user
 
 
 @router.get("/profile", response_model=ProfileRead)
 async def get_profile(
     user: Annotated[User, Depends(get_current_user)],
 ):
-    profile = await get_profile_uc(user)
-    return profile_mapper(profile)
+    return await get_profile_uc(user)
 
 
 @router.post("/profile", response_model=ProfileRead)
@@ -40,8 +47,7 @@ async def create_profile(
     user: Annotated[User, Depends(get_current_user)],
     profile_repository: Annotated[ProfilesRepository, Depends(get_profiles_repository)],
 ):
-    profile = await create_profile_uc(dto, user, repo=profile_repository)
-    return profile_mapper(profile)
+    return await create_profile_uc(dto, user, repo=profile_repository)
 
 
 @router.patch("/profile", response_model=ProfileRead)
@@ -50,8 +56,7 @@ async def update_profile(
     user: Annotated[User, Depends(get_current_user)],
     profile_repository: Annotated[ProfilesRepository, Depends(get_profiles_repository)],
 ):
-    profile = await update_profile_uc(dto, user, repo=profile_repository)
-    return profile_mapper(profile)
+    return await update_profile_uc(dto, user, repo=profile_repository)
 
 
 @router.delete("/profile", response_model=ProfileRead)
@@ -59,5 +64,4 @@ async def delete_profile(
     user: Annotated[User, Depends(get_current_user)],
     profile_repository: Annotated[ProfilesRepository, Depends(get_profiles_repository)],
 ):
-    profile = await delete_profile_uc(user, repo=profile_repository)
-    return profile_mapper(profile)
+    return await delete_profile_uc(user, repo=profile_repository)

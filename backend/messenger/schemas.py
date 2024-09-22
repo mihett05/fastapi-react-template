@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from core.pydantic import PydanticModel
 from users.schemas import UserRead
 
@@ -11,8 +14,8 @@ class MessageCreate(PydanticModel):
 class MessageRead(PydanticModel):
     id: int
     chat_id: int
-    receiver_id: int
     sender_id: int
+    created_at: datetime
     message_text: str
 
 
@@ -30,8 +33,5 @@ class ChatRead(PydanticModel):
 
 
 class ChatUpdate(PydanticModel):
-    pass
-
-
-class ChatDelete(PydanticModel):
-    pass
+    name: Optional[str] = None
+    members: Optional[list[int]] = []

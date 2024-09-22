@@ -2,8 +2,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from core.repository import BaseRepository
 from messenger.models import Message, Chat
-from messenger.schemas import MessageCreate, ChatCreate
+from messenger.schemas import MessageCreate, ChatCreate, ChatUpdate
 from users.models import User
 from .exceptions import MessageNotFound, ChatNotFound
 
@@ -18,16 +19,20 @@ class MessagesRepository:
         raise MessageNotFound()
 
     async def get_by_chat(self, chat_id: int) -> list[Message]:
-        if messages := await self.session.scalars(
-            select(Message).where(Message.chat_id == chat_id)  # type: ignore
-        ):
+        if messages := (
+            await self.session.scalars(
+                select(Message).where(Message.chat_id == chat_id)  # type: ignore
+            )
+        ).all():
             return messages  # type: ignore
         raise MessageNotFound()
 
     async def get_by_user(self, user_id: int) -> list[Message]:
-        if messages := await self.session.scalars(
-            select(Message).where(Message.receiver_id == user_id)  # type: ignore
-        ):
+        if messages := (
+            await self.session.scalars(
+                select(Message).where(Message.receiver_id == user_id)  # type: ignore
+            )
+        ).all():
             return messages  # type: ignore
         raise MessageNotFound()
 
@@ -46,7 +51,7 @@ class MessagesRepository:
         await self.session.commit()
 
 
-class ChatsRepository:
+class ChatsRepository(BaseRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -54,22 +59,35 @@ class ChatsRepository:
         if chat := await self.session.get(
             Chat,
             chat_id,
-            options=[selectinload(Chat.members), selectinload(Chat.messages)],
+            options=[
+                selectinload(Chat.members).selectinload(User.profile),
+                selectinload(Chat.messages),
+            ],
         ):
             return chat  # type: ignore
         raise ChatNotFound()
 
     async def get_list(self, user: User) -> list[Chat]:
-        if chats := await self.session.scalars(
-            select(Chat).where(Chat.members.contains(user))
-        ):
+        if chats := (
+            await self.session.scalars(
+                select(Chat)
+                .where(Chat.members.contains(user))
+                .options(
+                    selectinload(Chat.members).selectinload(User.profile),
+                    selectinload(Chat.messages),
+                )
+            )
+        ).all():
             return chats  # type: ignore
-
         raise ChatNotFound()
 
-    async def add(self, dto: ChatCreate) -> Chat:
-        model = Chat(name=dto.name, messages=[], members=dto.members)
+    async def add(self, model: Chat) -> Chat:
+        self.session.add(model)
+        await self.session.commit()
 
+        return model
+
+    async def update(self, model: Chat) -> Chat:
         self.session.add(model)
         await self.session.commit()
 
