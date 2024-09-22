@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from auth.deps import get_current_user
 from messenger.deps import get_chats_repository
 from messenger.repository import ChatsRepository
-from messenger.schemas import ChatCreate, ChatRead, ChatUpdate, ChatDelete
+from messenger.schemas import ChatCreate, ChatRead, ChatUpdate
 from messenger.usecases.chats import (
     get_chat_uc,
     create_chat_uc,

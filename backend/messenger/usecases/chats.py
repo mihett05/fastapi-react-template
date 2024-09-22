@@ -1,11 +1,9 @@
 from typing import Iterable
 
-from sqlalchemy.util import OrderedSet
-
 from messenger.exceptions import ChatPermissionDenied
 from messenger.models import Chat
 from messenger.repository import ChatsRepository
-from messenger.schemas import ChatCreate, ChatUpdate, ChatDelete
+from messenger.schemas import ChatCreate, ChatUpdate
 from users.models import User
 from users.repository import UsersRepository
 from users.usecases.users import get_users_uc
