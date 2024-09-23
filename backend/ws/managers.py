@@ -3,13 +3,14 @@ from typing import Dict
 from fastapi import WebSocket
 
 from auth.schemas import UserRead
+from users.models import User
 from ws.schemas import WSUserData
 
 
 class ConnectionManager:
     active_connections: Dict[int, WSUserData] = {}
 
-    def add(self, user: UserRead, websocket: WebSocket):
+    def add(self, user: User, websocket: WebSocket):
         self.active_connections[user.id] = WSUserData(
             user=user,
             websocket=websocket,

@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from api import api
 from auth.exceptions import InvalidCredentials
-from core.exceptions import EntityNotFound
+from core.exceptions import EntityNotFound, PermissionDenied
 
 
 def custom_generate_unique_id(route: APIRoute):
@@ -19,7 +19,7 @@ app = FastAPI(docs_url="/docs", generate_unique_id_function=custom_generate_uniq
 
 
 @app.exception_handler(IntegrityError)
-async def entity_not_found_exception_handler(_: Request, exc: EntityNotFound):
+async def invalid_data_was_provide_exception_handler(_: Request, exc: EntityNotFound):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"message": exc.args[0] if exc.args else "Invalid data was provide"},
@@ -34,10 +34,18 @@ async def entity_not_found_exception_handler(_: Request, exc: EntityNotFound):
     )
 
 
+@app.exception_handler(PermissionDenied)
+async def permission_denied_exception_handler(_: Request, exc: EntityNotFound):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"message": exc.args[0] if exc.args else "Permission denied"},
+    )
+
+
 @app.exception_handler(InvalidCredentials)
 async def invalid_credentials_exception_handler(_: Request, exc: InvalidCredentials):
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=status.HTTP_401_BAD_REQUEST,
         content={
             "message": exc.args[0] if exc.args else "Invalid credentials were provided"
         },

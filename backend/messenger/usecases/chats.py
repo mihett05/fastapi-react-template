@@ -1,3 +1,4 @@
+from copy import copy
 from typing import Iterable
 
 from messenger.exceptions import ChatPermissionDenied
@@ -5,8 +6,6 @@ from messenger.models import Chat
 from messenger.repository import ChatsRepository
 from messenger.schemas import ChatCreate, ChatUpdate
 from users.models import User
-from users.repository import UsersRepository
-from users.usecases.users import get_users
 
 
 async def get_chat(chat_id: int, user: User, *, repository: ChatsRepository) -> Chat:
@@ -22,12 +21,9 @@ async def get_chats(user: User, *, repository: ChatsRepository) -> Iterable[Chat
 
 
 async def create_chat(
-    dto: ChatCreate, *, repository: ChatsRepository, users_repository: UsersRepository
+    dto: ChatCreate, users: Iterable[User], *, repository: ChatsRepository
 ) -> Chat:
-    users = await get_users(dto.members, repository=users_repository)
-    chat = Chat(name=dto.name, messages=[], members=users)  # type: ignore
-
-    return await repository.add(chat)
+    return await repository.add(dto, users)
 
 
 async def update_chat_attrs(
@@ -46,7 +42,7 @@ async def update_chat_members(
     *,
     repository: ChatsRepository,
 ) -> Chat:
-    users = chat.members
+    users = copy(chat.members)
     users.update(include)
     for user in exclude:
         users.discard(user)

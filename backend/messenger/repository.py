@@ -1,15 +1,17 @@
-from sqlalchemy import select
+from typing import Iterable
+
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from core.repository import BaseRepository
 from messenger.models import Message, Chat
-from messenger.schemas import MessageCreate, ChatCreate, ChatUpdate
+from messenger.schemas import MessageCreate, ChatCreate, ChatUpdate, MessageUpdate
 from users.models import User
 from .exceptions import MessageNotFound, ChatNotFound
 
 
-class MessagesRepository:
+class MessagesRepository(BaseRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -30,25 +32,33 @@ class MessagesRepository:
     async def get_by_user(self, user_id: int) -> list[Message]:
         if messages := (
             await self.session.scalars(
-                select(Message).where(Message.receiver_id == user_id)  # type: ignore
+                select(Message).where(Message.sender_id == user_id)  # type: ignore
             )
         ).all():
             return messages  # type: ignore
         raise MessageNotFound()
 
-    async def add(self, message: MessageCreate) -> Message:
+    async def add(self, dto: MessageCreate, user: User) -> Message:
         model = Message(
-            chat_id=message.chat_id,
-            sender_id=message.sender_id,
-            message_text=message.message_text,
+            chat_id=dto.chat_id, sender_id=user.id, message_text=dto.message_text
         )
         self.session.add(model)
         await self.session.commit()
         return model
 
+    async def update(self, model: Message, dto: MessageUpdate) -> Message:
+        model = await self.update_model_attrs(model, dto)
+
+        await self.session.refresh(model)
+        await self.session.commit()
+
+        return model  # type: ignore
+
     async def delete(self, message: Message):
         await self.session.delete(message)
         await self.session.commit()
+
+        return message
 
 
 class ChatsRepository(BaseRepository):
@@ -81,7 +91,10 @@ class ChatsRepository(BaseRepository):
             return chats  # type: ignore
         raise ChatNotFound()
 
-    async def add(self, model: Chat) -> Chat:
+    async def add(self, dto: ChatCreate, members: Iterable[User]) -> Chat:
+        model = Chat(name=dto.name, messages=[], members=set())
+        model.members.update(members)
+
         self.session.add(model)
         await self.session.commit()
 
@@ -90,7 +103,7 @@ class ChatsRepository(BaseRepository):
     async def update_attrs(self, model: Chat, dto: ChatUpdate) -> Chat:
         model = await self.update_model_attrs(model, dto)
 
-        self.session.add(model)
+        await self.session.refresh(model)
         await self.session.commit()
 
         return model  # type: ignore
@@ -99,7 +112,7 @@ class ChatsRepository(BaseRepository):
         model.members.clear()
         model.members.update(members)
 
-        self.session.add(model)
+        await self.session.refresh(model)
         await self.session.commit()
 
         return model
