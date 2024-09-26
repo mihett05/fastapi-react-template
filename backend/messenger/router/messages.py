@@ -16,8 +16,10 @@ from messenger.usecases.messages import (
     get_message,
     update_message,
     delete_message,
+    send_message_notifications,
 )
 from users.models import User
+from ws.router import connect_manager
 
 router = APIRouter()
 
@@ -27,8 +29,12 @@ async def create_message_handler(
     dto: MessageCreate,
     user: Annotated[User, Depends(get_current_user)],  # noqa
     mess_repository: Annotated[MessagesRepository, Depends(get_messages_repository)],
+    chats_repository: Annotated[ChatsRepository, Depends(get_chats_repository)],
 ):
-    return await create_message(dto, repository=mess_repository)
+    chat = await get_chat(dto.chat_id, user, repository=chats_repository)
+    message = await create_message(dto, user, repository=mess_repository)
+    await send_message_notifications(chat, message, user, manager=connect_manager)
+    return message
 
 
 @router.get("/{chat_id}/{message_id}", response_model=MessageRead)

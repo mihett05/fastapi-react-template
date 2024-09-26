@@ -2,15 +2,11 @@ from inspect import getfullargspec
 from typing import Callable, Optional
 
 from fastapi import WebSocket
-from pydantic import ValidationError
-
-from auth.deps import fastapi_users
-from auth.models import UserRead
 
 from auth.tokens import TokensGateway
 from users.repository import UsersRepository
 from ws.managers import ConnectionManager
-from ws.schemas import EventType, Request, Response, WSUserData
+from ws.schemas import EventTypeRequest, Request, Response, WSUserData
 
 
 class SendResponse:
@@ -19,8 +15,8 @@ class SendResponse:
         self.websocket = websocket
 
     def update_response(self, response: Response):
-        # response.user = UserRead(**fastapi_users.get_user_manager().get(self.request.uid).__dict__)
-        response.event_type = self.request.event_type
+        # response.uuid = self.request.uuid
+        pass
 
     async def send(self, response: Response):
         self.update_response(response)
@@ -28,8 +24,8 @@ class SendResponse:
 
 
 class EventHandler:
-    def __init__(self, event_type: str):
-        self.type = event_type
+    def __init__(self, event: str):
+        self.type = event
         self.request_type = None
         self.response_type = None
         self.handlers = []
@@ -49,7 +45,7 @@ class EventHandler:
     async def run(
         self,
         data: dict,
-        event: EventType,
+        event: EventTypeRequest,
         websocket: WebSocket,
         manager: ConnectionManager,
         tokens_gateway: TokensGateway,
@@ -59,9 +55,7 @@ class EventHandler:
         if event != self.type:
             return
 
-        if event != EventType.AUTH and (
-            user_data is None or manager.is_user_authenticated(user_data.user)
-        ):
+        if event != EventTypeRequest.AUTH and user_data is None:
             raise ValueError(f"Permission denied (user should be authorized)")
 
         if not self.request_type or not issubclass(self.request_type, (Request,)):

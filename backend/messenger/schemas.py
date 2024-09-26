@@ -18,6 +18,11 @@ class MessageRead(PydanticModel):
     message_text: str
 
 
+class MessageReadWS(PydanticModel):
+    id: int
+    chat_id: int
+
+
 class MessageUpdate(PydanticModel):
     message_text: str
 

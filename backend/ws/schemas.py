@@ -1,28 +1,38 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Optional, Any
 
 from fastapi import WebSocket
-from pydantic import BaseModel
 
 from core.pydantic import PydanticModel
 from users.models import User
-from users.schemas import UserRead
+from uuid import UUID
 
 
-class EventType(str, Enum):
+class EventTypeRequest(str, Enum):
     AUTH: str = "AUTH"
-    MESSAGE: str = "MESSAGES"
-    NOTIFICATION: str = "NOTIFICATION"
+    GET_UPDATES: str = "GET_UPDATES"
+    # e.t.c.
+
+
+class EventTypeResponse(str, Enum):
+    EMPTY: str = "EMPTY"
+    SUCCESS: str = "SUCCESS"
+    FORBIDDEN: str = "FORBIDDEN"
+    NEW_MESSAGE: str = "NEW_MESSAGE"
     # e.t.c.
 
 
 class Request(PydanticModel):
-    event_type: EventType
+    # uuid: UUID
+    event: EventTypeRequest
 
 
 class Response(PydanticModel):
-    user: UserRead
-    event_type: EventType
+    # user: UserRead
+    # uuid: UUID
+    event: EventTypeResponse
+    data: Any = None
     # some addition fields
 
 
