@@ -22,3 +22,13 @@ class ConnectionManager:
     def remove(self, user: User, websocket: WebSocket):
         if self.active_connections.get(user.id) is websocket:
             self.active_connections.pop(user.id)
+
+
+class Singleton:
+    instance: ConnectionManager = None
+
+    @staticmethod
+    def get() -> ConnectionManager:
+        if Singleton.instance is None:
+            Singleton.instance = ConnectionManager()
+        return Singleton.instance

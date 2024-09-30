@@ -11,29 +11,26 @@ from uuid import UUID
 
 class EventTypeRequest(str, Enum):
     AUTH: str = "AUTH"
-    GET_UPDATES: str = "GET_UPDATES"
-    # e.t.c.
 
 
 class EventTypeResponse(str, Enum):
-    EMPTY: str = "EMPTY"
     SUCCESS: str = "SUCCESS"
     FORBIDDEN: str = "FORBIDDEN"
+
     NEW_MESSAGE: str = "NEW_MESSAGE"
-    # e.t.c.
+    UPDATED_MESSAGE: str = "UPDATED_MESSAGE"
+    DELETED_MESSAGE: str = "UPDATED_MESSAGE"
 
 
 class Request(PydanticModel):
-    # uuid: UUID
+    uuid: Optional[UUID] = None
     event: EventTypeRequest
 
 
 class Response(PydanticModel):
-    # user: UserRead
-    # uuid: UUID
+    uuid: UUID
     event: EventTypeResponse
     data: Any = None
-    # some addition fields
 
 
 @dataclass

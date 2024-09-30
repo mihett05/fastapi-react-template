@@ -10,11 +10,10 @@ from auth.tokens import TokensGateway
 from users.deps import get_users_repository
 from users.repository import UsersRepository
 from ws.events import handlers
-from ws.managers import ConnectionManager
-from ws.schemas import Request, EventTypeRequest, WSUserData, Response
+from ws.schemas import Request, EventTypeRequest, WSUserData
+from ws.managers import Singleton
 
 router = APIRouter()
-connect_manager = ConnectionManager()
 
 
 @router.websocket("")
@@ -23,6 +22,7 @@ async def websocket_endpoint(
     tokens_gateway: Annotated[TokensGateway, Depends(get_tokens)],
     users_repository: Annotated[UsersRepository, Depends(get_users_repository)],
 ):
+    connect_manager = Singleton.get()
     await websocket.accept()
 
     user_data: Optional[WSUserData] = None
